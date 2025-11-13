@@ -655,19 +655,17 @@
                 let performanceLevel = '';
                 let performanceClass = '';
                 
-                if (totalFinal >= 90) {
-                    performanceLevel = 'XUẤT SẮC';
-                    performanceClass = 'performance-excellent';
-                } else if (totalFinal >= 70) {
-                    performanceLevel = 'TỐT';
-                    performanceClass = 'performance-good';
-                } else if (totalFinal >= 50) {
-                    performanceLevel = 'ĐẠT YÊU CẦU';
-                    performanceClass = 'performance-average';
-                } else {
-                    performanceLevel = 'CẦN CẢI THIỆN';
-                    performanceClass = 'performance-poor';
-                }
+                // Tìm đoạn code này:
+if (totalFinal >= 100) {
+    performanceLevel = '10H CÓ MẶT CTY';
+    performanceClass = 'performance-excellent';
+} else if (totalFinal >= 80) {    // ĐÃ SỬA THÀNH 80%
+    performanceLevel = 'HÚ HỒN CHIM ÉN';
+    performanceClass = 'performance-average';
+} else {
+    performanceLevel = 'SẮP COOK RỒI';
+    performanceClass = 'performance-poor';
+}
                 
                 summaryText.innerHTML = `
                     Tổng điểm KPI của bạn là <strong>${totalFinal.toFixed(2)}%</strong>.<br>
