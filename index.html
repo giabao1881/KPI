@@ -43,7 +43,6 @@
             color: white;
             padding: 25px;
             text-align: center;
-            position: relative;
         }
         
         .logo {
@@ -64,44 +63,14 @@
             color: white;
         }
         
-        .admin-link {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-        
-        .btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .btn-secondary {
-            background-color: var(--secondary);
-            color: white;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .current-config {
+        .config-info {
             background: rgba(255,255,255,0.1);
             padding: 15px;
             border-radius: 8px;
             margin-top: 15px;
         }
         
-        .config-info {
+        .config-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
@@ -203,6 +172,13 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+            outline: none;
         }
         
         .result {
@@ -232,6 +208,20 @@
             display: flex;
             gap: 10px;
             margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            flex: 1;
+            justify-content: center;
         }
         
         .btn-primary {
@@ -278,17 +268,28 @@
             background-color: var(--success);
         }
         
+        .notification.info {
+            background-color: var(--secondary);
+        }
+        
         .performance-excellent { background-color: #d4edda; color: #155724; }
         .performance-good { background-color: #d1ecf1; color: #0c5460; }
         .performance-average { background-color: #fff3cd; color: #856404; }
         .performance-poor { background-color: #f8d7da; color: #721c24; }
+        
+        .last-update {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            text-align: center;
+        }
         
         @media (max-width: 768px) {
             .kpi-selection {
                 grid-template-columns: 1fr;
             }
             
-            .config-info {
+            .config-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -301,18 +302,15 @@
                 <i class="fas fa-chart-line"></i>
                 <h1>HỆ THỐNG TÍNH KPI</h1>
             </div>
-            <p>Công cụ tính KPI trưởng bộ phận</p>
+            <p>Công cụ tính KPI trưởng bộ phận - Tự động cập nhật</p>
             
-            <div class="admin-link">
-                <a href="admin.html" class="btn btn-secondary">
-                    <i class="fas fa-cog"></i> Quản trị
-                </a>
-            </div>
-            
-            <div class="current-config">
-                <div><i class="fas fa-info-circle"></i> Trọng số KPI hiện tại</div>
-                <div class="config-info" id="currentConfig">
+            <div class="config-info">
+                <div><i class="fas fa-info-circle"></i> Trọng số KPI hiện tại (Tự động cập nhật từ GitHub)</div>
+                <div class="config-grid" id="currentConfig">
                     <!-- Hiển thị config hiện tại -->
+                </div>
+                <div class="last-update" id="lastUpdate">
+                    <!-- Hiển thị thời gian cập nhật -->
                 </div>
             </div>
         </header>
@@ -380,16 +378,16 @@
             
             <div class="controls">
                 <button class="btn btn-primary" id="saveData">
-                    <i class="fas fa-save"></i> Lưu Dữ Liệu
+                    <i class="fas fa-save"></i> Lưu Dữ Liệu Cá Nhân
                 </button>
-                <button class="btn btn-success" id="calculate">
-                    <i class="fas fa-calculator"></i> Tính KPI
+                <button class="btn btn-success" id="checkUpdate">
+                    <i class="fas fa-sync"></i> Kiểm Tra Cập Nhật
                 </button>
             </div>
         </div>
         
         <footer>
-            <p>Hệ thống tính KPI Trưởng Bộ Phận &copy; 2023</p>
+            <p>Hệ thống tính KPI Trưởng Bộ Phận &copy; 2023 - Tự động cập nhật từ GitHub</p>
         </footer>
     </div>
     
@@ -399,20 +397,23 @@
     </div>
 
     <script>
+        // URL đến file config trên GitHub (bạn cần thay đổi thành URL thực tế)
+        const CONFIG_URL = 'https://raw.githubusercontent.com/your-username/your-repo/main/kpi-config.json';
+        
         let currentConfig = {};
         let selectedKPIs = [];
         let currentMonth = '';
         
         // Khởi tạo ứng dụng
         document.addEventListener('DOMContentLoaded', function() {
-            // Tải cấu hình từ localStorage
-            loadConfig();
+            // Tải cấu hình từ GitHub
+            loadConfigFromGitHub();
             
             // Thiết lập sự kiện cho nút lưu dữ liệu
             document.getElementById('saveData').addEventListener('click', saveToLocalStorage);
             
-            // Thiết lập sự kiện cho nút tính KPI
-            document.getElementById('calculate').addEventListener('click', calculateKPI);
+            // Thiết lập sự kiện cho nút kiểm tra cập nhật
+            document.getElementById('checkUpdate').addEventListener('click', loadConfigFromGitHub);
             
             // Thiết lập sự kiện cho các checkbox KPI
             document.querySelectorAll('.kpi-option input[type="checkbox"]').forEach(checkbox => {
@@ -432,26 +433,61 @@
                 });
             });
             
-            // Cập nhật bảng KPI ban đầu
-            updateKPITable();
+            // Tự động kiểm tra cập nhật mỗi 5 phút
+            setInterval(loadConfigFromGitHub, 5 * 60 * 1000);
         });
         
-        // Tải cấu hình
-        function loadConfig() {
-            const savedConfig = localStorage.getItem('kpiConfig');
-            if (savedConfig) {
-                const configData = JSON.parse(savedConfig);
-                currentConfig = configData.config || getDefaultConfig();
-                currentMonth = configData.month || 'Tháng 11';
-            } else {
-                currentConfig = getDefaultConfig();
-                currentMonth = 'Tháng 11';
+        // Tải cấu hình từ GitHub
+        async function loadConfigFromGitHub() {
+            try {
+                showNotification('Đang tải cấu hình mới nhất từ GitHub...', 'info');
+                
+                const response = await fetch(CONFIG_URL + '?t=' + new Date().getTime());
+                
+                if (!response.ok) {
+                    throw new Error('Không thể tải cấu hình từ GitHub');
+                }
+                
+                const configData = await response.json();
+                currentConfig = configData.config;
+                currentMonth = configData.month;
+                
+                // Lưu vào localStorage để dùng khi offline
+                localStorage.setItem('kpiConfig', JSON.stringify(configData));
+                localStorage.setItem('kpiConfigLastUpdate', new Date().toLocaleString('vi-VN'));
+                
+                updateConfigDisplay();
+                updateKPITable();
+                
+                showNotification('Đã cập nhật cấu hình mới nhất!', 'success');
+                
+            } catch (error) {
+                console.error('Lỗi khi tải cấu hình:', error);
+                // Nếu không tải được từ GitHub, dùng bản trong localStorage
+                loadConfigFromLocalStorage();
+                showNotification('Đang sử dụng cấu hình cũ (lỗi kết nối GitHub)', 'info');
             }
-            
-            updateConfigDisplay();
         }
         
-        // Cấu hình mặc định
+        // Tải cấu hình từ localStorage
+        function loadConfigFromLocalStorage() {
+            const savedConfig = localStorage.getItem('kpiConfig');
+            const lastUpdate = localStorage.getItem('kpiConfigLastUpdate');
+            
+            if (savedConfig) {
+                const configData = JSON.parse(savedConfig);
+                currentConfig = configData.config;
+                currentMonth = configData.month;
+                updateConfigDisplay(lastUpdate);
+            } else {
+                // Nếu không có config nào, dùng mặc định
+                currentConfig = getDefaultConfig();
+                currentMonth = 'Tháng 11';
+                updateConfigDisplay();
+            }
+        }
+        
+        // Cấu hình mặc định (dự phòng)
         function getDefaultConfig() {
             return {
                 "thuly-sec": { 
@@ -488,9 +524,10 @@
         }
         
         // Cập nhật hiển thị cấu hình
-        function updateConfigDisplay() {
+        function updateConfigDisplay(lastUpdate = null) {
             const monthInfo = document.getElementById('monthInfo');
             const configContainer = document.getElementById('currentConfig');
+            const lastUpdateElement = document.getElementById('lastUpdate');
             
             monthInfo.innerHTML = `<i class="fas fa-calendar-alt"></i> ${currentMonth}`;
             configContainer.innerHTML = '';
@@ -509,6 +546,12 @@
                 
                 configContainer.appendChild(configItem);
             });
+            
+            if (lastUpdate) {
+                lastUpdateElement.textContent = `Cập nhật lần cuối: ${lastUpdate}`;
+            } else {
+                lastUpdateElement.textContent = `Cập nhật lần cuối: ${new Date().toLocaleString('vi-VN')}`;
+            }
         }
         
         // Cập nhật bảng KPI
@@ -529,6 +572,13 @@
                 `;
                 
                 tableBody.appendChild(row);
+                
+                // Thêm sự kiện tính toán tự động khi nhập liệu
+                const kpiInput = document.getElementById(`kpi_${kpi}`);
+                const actualInput = document.getElementById(`actual_${kpi}`);
+                
+                kpiInput.addEventListener('input', calculateKPI);
+                actualInput.addEventListener('input', calculateKPI);
             });
             
             // Cập nhật tổng
@@ -537,9 +587,12 @@
             
             // Cập nhật tổng kết
             updateSummary();
+            
+            // Tính toán lại nếu có dữ liệu cũ
+            calculateKPI();
         }
         
-        // Tính toán KPI
+        // Tính toán KPI (tự động khi nhập liệu)
         function calculateKPI() {
             let totalPercent = 0;
             let totalFinal = 0;
@@ -582,9 +635,6 @@
             
             // Cập nhật tổng kết
             updateSummary();
-            
-            // Hiển thị thông báo
-            showNotification('Đã tính toán KPI thành công!', 'success');
         }
         
         // Cập nhật phần tổng kết
@@ -653,7 +703,7 @@
             });
             
             localStorage.setItem('kpiUserData', JSON.stringify(data));
-            showNotification('Dữ liệu đã được lưu thành công!', 'success');
+            showNotification('Dữ liệu cá nhân đã được lưu thành công!', 'success');
         }
         
         // Tải dữ liệu từ localStorage
@@ -692,6 +742,9 @@
                                 actualInput.value = data.kpiValues[kpi].actual;
                             }
                         });
+                        
+                        // Tính toán lại KPI
+                        calculateKPI();
                     }, 100);
                 }
             }
