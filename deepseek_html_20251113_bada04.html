@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Tính KPI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .logo i {
+            font-size: 36px;
+            color: var(--secondary);
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .config-section {
+            background: var(--light);
+            padding: 25px;
+            border-right: 1px solid #ddd;
+        }
+        
+        .calc-section {
+            padding: 25px;
+        }
+        
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .month-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .month-selector select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .config-grid {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .config-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .config-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .config-name {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .weights {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .weight-input {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .weight-input label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .weight-input input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .kpi-selection {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .kpi-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .kpi-option:hover {
+            background: #dfe6e9;
+        }
+        
+        .kpi-option.selected {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .kpi-option input {
+            width: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 10px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .result {
+            font-weight: bold;
+            background-color: #e8f4fd;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: var(--light);
+        }
+        
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .summary h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: #666;
+            font-size: 14px;
+            background: var(--light);
+            border-top: 1px solid #ddd;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(150%);
+            transition: transform 0.5s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--success);
+        }
+        
+        .performance-excellent { background-color: #d4edda; color: #155724; }
+        .performance-good { background-color: #d1ecf1; color: #0c5460; }
+        .performance-average { background-color: #fff3cd; color: #856404; }
+        .performance-poor { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>HỆ THỐNG TÍNH KPI</h1>
+            </div>
+            <p class="subtitle">Công cụ tính KPI trưởng bộ phận - Đơn giản & Hiệu quả</p>
+        </header>
+        
+        <div class="main-content">
+            <!-- Phần cấu hình trọng số -->
+            <div class="config-section">
+                <h2 class="section-title">
+                    <i class="fas fa-sliders-h"></i> CẤU HÌNH TRỌNG SỐ
+                </h2>
+                
+                <div class="month-selector">
+                    <label for="configMonth"><strong>KPI Tháng:</strong></label>
+                    <select id="configMonth">
+                        <option value="1">Tháng 1</option>
+                        <option value="2">Tháng 2</option>
+                        <option value="3">Tháng 3</option>
+                        <option value="4">Tháng 4</option>
+                        <option value="5">Tháng 5</option>
+                        <option value="6">Tháng 6</option>
+                        <option value="7">Tháng 7</option>
+                        <option value="8">Tháng 8</option>
+                        <option value="9">Tháng 9</option>
+                        <option value="10">Tháng 10</option>
+                        <option value="11" selected>Tháng 11</option>
+                        <option value="12">Tháng 12</option>
+                    </select>
+                </div>
+                
+                <div class="config-grid">
+                    <div class="config-item">
+                        <div class="config-header">
+                            <div class="config-name">Thụ lý SEC</div>
+                        </div>
+                        <div class="weights">
+                            <div class="weight-input">
+                                <label>Tỷ trọng nội bộ</label>
+                                <input type="number" id="internalWeight1" min="0" max="100" value="30">
+                            </div>
+                            <div class="weight-input">
+                                <label>Tỉ trọng cấp 1</label>
+                                <input type="number" id="level1Weight1" min="0" max="100" value="50">
+                            </div>
+                            <div class="weight-input">
+                                <label>Tỉ trọng cấp 2</label>
+                                <input type="number" id="level2Weight1" min="0" max="100" value="100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <div class="config-header">
+                            <div class="config-name">Thụ lý UNS</div>
+                        </div>
+                        <div class="weights">
+                            <div class="weight-input">
+                                <label>Tỷ trọng nội bộ</label>
+                                <input type="number" id="internalWeight2" min="0" max="100" value="30">
+                            </div>
+                            <div class="weight-input">
+                                <label>Tỉ trọng cấp 1</label>
+                                <input type="number" id="level1Weight2" min="0" max="100" value="50">
+                            </div>
+                            <div class="weight-input">
+                                <label>Tỉ trọng cấp 2</label>
+                                <input type="number" id="level2Weight2" min="0" max="100" value="80">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <div class="config-header">
+                            <div class="config-name">Bản án UNS</div>
+                        </div>
+                        <div class="weights">
+                            <div class="weight-input">
+                                <label>Tỷ trọng nội bộ</label>
+                                <input type="number" id="internalWeight3" min="0" max="100" value="30">
+                            </div>
+                            <div class="weight-input">
+                                <label>Tỉ trọng cấp 1</label>
+                                <input type="number" id="level1Weight3" min="0" max="100" value="50">
+                            </div>
+                            <div class="weight-input">
+                                <label>Tỉ trọng cấp 2</label>
+                                <input type="number" id="level2Weight3" min="0" max="100" value="20">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <div class="config-header">
+                            <div class="config-name">Số thu SEC</div>
+                        </div>
+                        <div class="weights">
+                            <div class="weight-input">
+                                <label>Tỷ trọng nội bộ</label>
+                                <input type="number" id="internalWeight4" min="0" max="100" value="70">
+                            </div>
+                            <div class="weight-input">
+                                <label>Tỉ trọng cấp 1</label>
+                                <input type="number" id="level1Weight4" min="0" max="100" value="60">
+                            </div>
+                            <div class="weight-input">
+                                <label>Tỉ trọng cấp 2</label>
+                                <input type="number" id="level2Weight4" min="0" max="100" value="100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <div class="config-header">
+                            <div class="config-name">Số thu UNS</div>
+                        </div>
+                        <div class="weights">
+                            <div class="weight-input">
+                                <label>Tỷ trọng nội bộ</label>
+                                <input type="number" id="internalWeight5" min="0" max="100" value="70">
+                            </div>
+                            <div class="weight-input">
+                                <label>Tỉ trọng cấp 1</label>
+                                <input type="number" id="level1Weight5" min="0" max="100" value="40">
+                            </div>
+                            <div class="weight-input">
+                                <label>Tỉ trọng cấp 2</label>
+                                <input type="number" id="level2Weight5" min="0" max="100" value="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-success" id="saveConfig">
+                        <i class="fas fa-save"></i> Lưu Cấu Hình
+                    </button>
+                    <button class="btn btn-primary" id="resetConfig">
+                        <i class="fas fa-undo"></i> Mặc Định
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Phần tính KPI -->
+            <div class="calc-section">
+                <h2 class="section-title">
+                    <i class="fas fa-calculator"></i> TÍNH KPI CÁ NHÂN
+                </h2>
+                
+                <div class="month-selector">
+                    <label for="calcMonth"><strong>KPI Tháng:</strong></label>
+                    <select id="calcMonth">
+                        <option value="1">Tháng 1</option>
+                        <option value="2">Tháng 2</option>
+                        <option value="3">Tháng 3</option>
+                        <option value="4">Tháng 4</option>
+                        <option value="5">Tháng 5</option>
+                        <option value="6">Tháng 6</option>
+                        <option value="7">Tháng 7</option>
+                        <option value="8">Tháng 8</option>
+                        <option value="9">Tháng 9</option>
+                        <option value="10">Tháng 10</option>
+                        <option value="11" selected>Tháng 11</option>
+                        <option value="12">Tháng 12</option>
+                    </select>
+                </div>
+                
+                <div class="kpi-selection">
+                    <div class="kpi-option" data-kpi="thuly-sec">
+                        <input type="checkbox" id="kpiThulySec">
+                        <label for="kpiThulySec">Thụ lý SEC</label>
+                    </div>
+                    <div class="kpi-option" data-kpi="thuly-uns">
+                        <input type="checkbox" id="kpiThulyUns">
+                        <label for="kpiThulyUns">Thụ lý UNS</label>
+                    </div>
+                    <div class="kpi-option" data-kpi="ba-uns">
+                        <input type="checkbox" id="kpiBaUns">
+                        <label for="kpiBaUns">Bản án UNS</label>
+                    </div>
+                    <div class="kpi-option" data-kpi="sothu-sec">
+                        <input type="checkbox" id="kpiSothuSec">
+                        <label for="kpiSothuSec">Số thu SEC</label>
+                    </div>
+                    <div class="kpi-option" data-kpi="sothu-uns">
+                        <input type="checkbox" id="kpiSothuUns">
+                        <label for="kpiSothuUns">Số thu UNS</label>
+                    </div>
+                </div>
+                
+                <table id="kpiTable">
+                    <thead>
+                        <tr>
+                            <th>Chỉ tiêu</th>
+                            <th>KPI Giao</th>
+                            <th>Thực hiện</th>
+                            <th>% Hoàn thành</th>
+                            <th>KPI FINAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kpiTableBody">
+                        <!-- Dữ liệu sẽ được thêm động bằng JavaScript -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td style="text-align: right; font-weight: bold;">TỔNG CỘNG</td>
+                            <td></td>
+                            <td></td>
+                            <td id="totalPercent">0%</td>
+                            <td id="totalFinal" class="result">0%</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+                <div class="summary" id="summary">
+                    <h3><i class="fas fa-chart-pie"></i> TỔNG KẾT KPI</h3>
+                    <p id="summaryText">Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.</p>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" id="saveData">
+                        <i class="fas fa-save"></i> Lưu Dữ Liệu
+                    </button>
+                    <button class="btn btn-success" id="calculate">
+                        <i class="fas fa-calculator"></i> Tính KPI
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Hệ thống tính KPI Trưởng Bộ Phận &copy; 2023 - Phiên bản Đơn giản</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Thao tác thành công!</span>
+    </div>
+
+    <script>
+        // Dữ liệu mẫu
+        const defaultConfig = {
+            "thuly-sec": { 
+                name: "Thụ lý SEC",
+                internal: 30, 
+                level1: 50, 
+                level2: 100 
+            },
+            "thuly-uns": { 
+                name: "Thụ lý UNS",
+                internal: 30, 
+                level1: 50, 
+                level2: 80 
+            },
+            "ba-uns": { 
+                name: "Bản án UNS",
+                internal: 30, 
+                level1: 50, 
+                level2: 20 
+            },
+            "sothu-sec": { 
+                name: "Số thu SEC",
+                internal: 70, 
+                level1: 60, 
+                level2: 100 
+            },
+            "sothu-uns": { 
+                name: "Số thu UNS",
+                internal: 70, 
+                level1: 40, 
+                level2: 100 
+            }
+        };
+        
+        let currentConfig = JSON.parse(JSON.stringify(defaultConfig));
+        let selectedKPIs = [];
+        
+        // Khởi tạo ứng dụng
+        document.addEventListener('DOMContentLoaded', function() {
+            // Khôi phục dữ liệu từ localStorage nếu có
+            loadFromLocalStorage();
+            
+            // Thiết lập sự kiện cho nút lưu cấu hình
+            document.getElementById('saveConfig').addEventListener('click', saveConfig);
+            
+            // Thiết lập sự kiện cho nút khôi phục mặc định
+            document.getElementById('resetConfig').addEventListener('click', resetConfig);
+            
+            // Thiết lập sự kiện cho nút lưu dữ liệu
+            document.getElementById('saveData').addEventListener('click', saveToLocalStorage);
+            
+            // Thiết lập sự kiện cho nút tính KPI
+            document.getElementById('calculate').addEventListener('click', calculateKPI);
+            
+            // Thiết lập sự kiện cho các checkbox KPI
+            document.querySelectorAll('.kpi-option input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const kpiOption = this.closest('.kpi-option');
+                    if (this.checked) {
+                        kpiOption.classList.add('selected');
+                        selectedKPIs.push(kpiOption.getAttribute('data-kpi'));
+                    } else {
+                        kpiOption.classList.remove('selected');
+                        const index = selectedKPIs.indexOf(kpiOption.getAttribute('data-kpi'));
+                        if (index > -1) {
+                            selectedKPIs.splice(index, 1);
+                        }
+                    }
+                    updateKPITable();
+                });
+            });
+            
+            // Cập nhật bảng KPI ban đầu
+            updateKPITable();
+        });
+        
+        // Lưu cấu hình
+        function saveConfig() {
+            // Cập nhật currentConfig từ các input
+            currentConfig["thuly-sec"].internal = parseFloat(document.getElementById('internalWeight1').value);
+            currentConfig["thuly-sec"].level1 = parseFloat(document.getElementById('level1Weight1').value);
+            currentConfig["thuly-sec"].level2 = parseFloat(document.getElementById('level2Weight1').value);
+            
+            currentConfig["thuly-uns"].internal = parseFloat(document.getElementById('internalWeight2').value);
+            currentConfig["thuly-uns"].level1 = parseFloat(document.getElementById('level1Weight2').value);
+            currentConfig["thuly-uns"].level2 = parseFloat(document.getElementById('level2Weight2').value);
+            
+            currentConfig["ba-uns"].internal = parseFloat(document.getElementById('internalWeight3').value);
+            currentConfig["ba-uns"].level1 = parseFloat(document.getElementById('level1Weight3').value);
+            currentConfig["ba-uns"].level2 = parseFloat(document.getElementById('level2Weight3').value);
+            
+            currentConfig["sothu-sec"].internal = parseFloat(document.getElementById('internalWeight4').value);
+            currentConfig["sothu-sec"].level1 = parseFloat(document.getElementById('level1Weight4').value);
+            currentConfig["sothu-sec"].level2 = parseFloat(document.getElementById('level2Weight4').value);
+            
+            currentConfig["sothu-uns"].internal = parseFloat(document.getElementById('internalWeight5').value);
+            currentConfig["sothu-uns"].level1 = parseFloat(document.getElementById('level1Weight5').value);
+            currentConfig["sothu-uns"].level2 = parseFloat(document.getElementById('level2Weight5').value);
+            
+            // Lưu vào localStorage
+            saveToLocalStorage();
+            
+            // Hiển thị thông báo
+            showNotification('Cấu hình đã được lưu thành công!', 'success');
+            
+            // Cập nhật bảng KPI
+            updateKPITable();
+        }
+        
+        // Khôi phục cấu hình mặc định
+        function resetConfig() {
+            if (confirm('Bạn có chắc chắn muốn khôi phục cấu hình mặc định?')) {
+                currentConfig = JSON.parse(JSON.stringify(defaultConfig));
+                
+                // Cập nhật các input
+                document.getElementById('internalWeight1').value = currentConfig["thuly-sec"].internal;
+                document.getElementById('level1Weight1').value = currentConfig["thuly-sec"].level1;
+                document.getElementById('level2Weight1').value = currentConfig["thuly-sec"].level2;
+                
+                document.getElementById('internalWeight2').value = currentConfig["thuly-uns"].internal;
+                document.getElementById('level1Weight2').value = currentConfig["thuly-uns"].level1;
+                document.getElementById('level2Weight2').value = currentConfig["thuly-uns"].level2;
+                
+                document.getElementById('internalWeight3').value = currentConfig["ba-uns"].internal;
+                document.getElementById('level1Weight3').value = currentConfig["ba-uns"].level1;
+                document.getElementById('level2Weight3').value = currentConfig["ba-uns"].level2;
+                
+                document.getElementById('internalWeight4').value = currentConfig["sothu-sec"].internal;
+                document.getElementById('level1Weight4').value = currentConfig["sothu-sec"].level1;
+                document.getElementById('level2Weight4').value = currentConfig["sothu-sec"].level2;
+                
+                document.getElementById('internalWeight5').value = currentConfig["sothu-uns"].internal;
+                document.getElementById('level1Weight5').value = currentConfig["sothu-uns"].level1;
+                document.getElementById('level2Weight5').value = currentConfig["sothu-uns"].level2;
+                
+                // Lưu vào localStorage
+                saveToLocalStorage();
+                
+                // Hiển thị thông báo
+                showNotification('Đã khôi phục cấu hình mặc định!', 'success');
+                
+                // Cập nhật bảng KPI
+                updateKPITable();
+            }
+        }
+        
+        // Cập nhật bảng KPI
+        function updateKPITable() {
+            const tableBody = document.getElementById('kpiTableBody');
+            tableBody.innerHTML = '';
+            
+            selectedKPIs.forEach((kpi, index) => {
+                const row = document.createElement('tr');
+                const config = currentConfig[kpi];
+                
+                // Xác định tên chỉ tiêu
+                let indicatorName = config.name;
+                
+                row.innerHTML = `
+                    <td>${indicatorName}</td>
+                    <td><input type="number" id="kpi_${kpi}" placeholder="Nhập KPI" step="0.01" min="0"></td>
+                    <td><input type="number" id="actual_${kpi}" placeholder="Nhập thực hiện" step="0.01" min="0"></td>
+                    <td id="percent_${kpi}">0%</td>
+                    <td id="final_${kpi}" class="result">0%</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Cập nhật tổng
+            document.getElementById('totalPercent').textContent = '0%';
+            document.getElementById('totalFinal').textContent = '0%';
+            
+            // Cập nhật tổng kết
+            updateSummary();
+        }
+        
+        // Tính toán KPI
+        function calculateKPI() {
+            let totalPercent = 0;
+            let totalFinal = 0;
+            let validRows = 0;
+            
+            selectedKPIs.forEach(kpi => {
+                const kpiInput = document.getElementById(`kpi_${kpi}`);
+                const actualInput = document.getElementById(`actual_${kpi}`);
+                const percentCell = document.getElementById(`percent_${kpi}`);
+                const finalCell = document.getElementById(`final_${kpi}`);
+                
+                const kpiValue = parseFloat(kpiInput.value) || 0;
+                const actualValue = parseFloat(actualInput.value) || 0;
+                const config = currentConfig[kpi];
+                
+                // Tính trọng số chi tiết (chuyển từ % sang số thập phân)
+                const detailWeight = (config.internal / 100) * (config.level1 / 100) * (config.level2 / 100);
+                
+                let percent = 0;
+                if (kpiValue > 0) {
+                    percent = Math.min(actualValue / kpiValue, 1.5); // Giới hạn tối đa 150%
+                }
+                
+                const final = percent * detailWeight * 100; // Chuyển sang %
+                
+                percentCell.textContent = (percent * 100).toFixed(2) + '%';
+                finalCell.textContent = final.toFixed(2) + '%';
+                
+                if (kpiValue > 0) {
+                    totalPercent += percent;
+                    totalFinal += final;
+                    validRows++;
+                }
+            });
+            
+            // Cập nhật tổng
+            const avgPercent = validRows > 0 ? totalPercent / validRows : 0;
+            document.getElementById('totalPercent').textContent = (avgPercent * 100).toFixed(2) + '%';
+            document.getElementById('totalFinal').textContent = totalFinal.toFixed(2) + '%';
+            
+            // Cập nhật tổng kết
+            updateSummary();
+            
+            // Hiển thị thông báo
+            showNotification('Đã tính toán KPI thành công!', 'success');
+        }
+        
+        // Cập nhật phần tổng kết
+        function updateSummary() {
+            const totalFinal = parseFloat(document.getElementById('totalFinal').textContent) || 0;
+            const summaryText = document.getElementById('summaryText');
+            const summary = document.getElementById('summary');
+            
+            if (selectedKPIs.length === 0) {
+                summaryText.textContent = 'Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.';
+                summary.className = 'summary';
+            } else if (totalFinal === 0) {
+                summaryText.textContent = 'Vui lòng nhập giá trị KPI Giao và Thực hiện để xem kết quả.';
+                summary.className = 'summary';
+            } else {
+                let performanceLevel = '';
+                let performanceClass = '';
+                
+                if (totalFinal >= 90) {
+                    performanceLevel = 'XUẤT SẮC';
+                    performanceClass = 'performance-excellent';
+                } else if (totalFinal >= 70) {
+                    performanceLevel = 'TỐT';
+                    performanceClass = 'performance-good';
+                } else if (totalFinal >= 50) {
+                    performanceLevel = 'ĐẠT YÊU CẦU';
+                    performanceClass = 'performance-average';
+                } else {
+                    performanceLevel = 'CẦN CẢI THIỆN';
+                    performanceClass = 'performance-poor';
+                }
+                
+                summaryText.innerHTML = `
+                    Tổng điểm KPI của bạn là <strong>${totalFinal.toFixed(2)}%</strong>.<br>
+                    Mức độ hoàn thành: <strong>${performanceLevel}</strong>.
+                `;
+                summary.className = `summary ${performanceClass}`;
+            }
+        }
+        
+        // Hiển thị thông báo
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Lưu dữ liệu vào localStorage
+        function saveToLocalStorage() {
+            const data = {
+                config: currentConfig,
+                selectedKPIs: selectedKPIs,
+                kpiValues: {}
+            };
+            
+            // Lưu giá trị KPI và thực hiện
+            selectedKPIs.forEach(kpi => {
+                const kpiValue = document.getElementById(`kpi_${kpi}`)?.value || '';
+                const actualValue = document.getElementById(`actual_${kpi}`)?.value || '';
+                data.kpiValues[kpi] = { kpi: kpiValue, actual: actualValue };
+            });
+            
+            localStorage.setItem('kpiSystemData', JSON.stringify(data));
+            showNotification('Dữ liệu đã được lưu thành công!', 'success');
+        }
+        
+        // Tải dữ liệu từ localStorage
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('kpiSystemData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                currentConfig = data.config || currentConfig;
+                selectedKPIs = data.selectedKPIs || [];
+                
+                // Cập nhật các input trong phần cấu hình
+                document.getElementById('internalWeight1').value = currentConfig["thuly-sec"].internal;
+                document.getElementById('level1Weight1').value = currentConfig["thuly-sec"].level1;
+                document.getElementById('level2Weight1').value = currentConfig["thuly-sec"].level2;
+                
+                document.getElementById('internalWeight2').value = currentConfig["thuly-uns"].internal;
+                document.getElementById('level1Weight2').value = currentConfig["thuly-uns"].level1;
+                document.getElementById('level2Weight2').value = currentConfig["thuly-uns"].level2;
+                
+                document.getElementById('internalWeight3').value = currentConfig["ba-uns"].internal;
+                document.getElementById('level1Weight3').value = currentConfig["ba-uns"].level1;
+                document.getElementById('level2Weight3').value = currentConfig["ba-uns"].level2;
+                
+                document.getElementById('internalWeight4').value = currentConfig["sothu-sec"].internal;
+                document.getElementById('level1Weight4').value = currentConfig["sothu-sec"].level1;
+                document.getElementById('level2Weight4').value = currentConfig["sothu-sec"].level2;
+                
+                document.getElementById('internalWeight5').value = currentConfig["sothu-uns"].internal;
+                document.getElementById('level1Weight5').value = currentConfig["sothu-uns"].level1;
+                document.getElementById('level2Weight5').value = currentConfig["sothu-uns"].level2;
+                
+                // Cập nhật các checkbox KPI
+                document.querySelectorAll('.kpi-option input[type="checkbox"]').forEach(checkbox => {
+                    const kpiOption = checkbox.closest('.kpi-option');
+                    const kpi = kpiOption.getAttribute('data-kpi');
+                    
+                    if (selectedKPIs.includes(kpi)) {
+                        checkbox.checked = true;
+                        kpiOption.classList.add('selected');
+                    } else {
+                        checkbox.checked = false;
+                        kpiOption.classList.remove('selected');
+                    }
+                });
+                
+                // Cập nhật bảng KPI
+                updateKPITable();
+                
+                // Khôi phục giá trị KPI và thực hiện
+                if (data.kpiValues) {
+                    setTimeout(() => {
+                        Object.keys(data.kpiValues).forEach(kpi => {
+                            const kpiInput = document.getElementById(`kpi_${kpi}`);
+                            const actualInput = document.getElementById(`actual_${kpi}`);
+                            
+                            if (kpiInput && actualInput) {
+                                kpiInput.value = data.kpiValues[kpi].kpi;
+                                actualInput.value = data.kpiValues[kpi].actual;
+                            }
+                        });
+                    }, 100);
+                }
+                
+                showNotification('Đã tải dữ liệu thành công!', 'success');
+            }
+        }
+    </script>
+</body>
+</html>
