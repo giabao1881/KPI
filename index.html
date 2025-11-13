@@ -13,7 +13,6 @@
             --warning: #f39c12;
             --danger: #e74c3c;
             --light: #ecf0f1;
-            --dark: #34495e;
         }
         
         * {
@@ -31,7 +30,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -44,6 +43,7 @@
             color: white;
             padding: 25px;
             text-align: center;
+            position: relative;
         }
         
         .logo {
@@ -64,33 +64,59 @@
             color: white;
         }
         
-        .subtitle {
-            font-size: 16px;
-            opacity: 0.8;
-            margin-top: 5px;
+        .admin-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .current-config {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .config-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .config-item {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
         }
         
         .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-            min-height: 600px;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .config-section {
-            background: var(--light);
-            padding: 25px;
-            border-right: 1px solid #ddd;
-        }
-        
-        .calc-section {
-            padding: 25px;
+            padding: 30px;
         }
         
         .section-title {
@@ -103,79 +129,22 @@
             gap: 10px;
         }
         
-        .month-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 25px;
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .month-selector select {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        
-        .config-grid {
-            display: grid;
-            gap: 15px;
-        }
-        
-        .config-item {
-            background: white;
+        .month-info {
+            background: var(--light);
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .config-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .config-name {
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .weights {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-        }
-        
-        .weight-input {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .weight-input label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        
-        .weight-input input {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            margin-bottom: 20px;
             text-align: center;
             font-weight: bold;
+            font-size: 18px;
+            color: var(--primary);
         }
         
         .kpi-selection {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .kpi-option {
@@ -248,7 +217,7 @@
         
         .summary {
             margin-top: 20px;
-            padding: 15px;
+            padding: 20px;
             background: #e8f4fd;
             border-radius: 8px;
             border-left: 4px solid var(--secondary);
@@ -265,20 +234,6 @@
             margin-top: 20px;
         }
         
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            flex: 1;
-            justify-content: center;
-        }
-        
         .btn-primary {
             background-color: var(--secondary);
             color: white;
@@ -287,11 +242,6 @@
         .btn-success {
             background-color: var(--success);
             color: white;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
         }
         
         footer {
@@ -332,6 +282,16 @@
         .performance-good { background-color: #d1ecf1; color: #0c5460; }
         .performance-average { background-color: #fff3cd; color: #856404; }
         .performance-poor { background-color: #f8d7da; color: #721c24; }
+        
+        @media (max-width: 768px) {
+            .kpi-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .config-info {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -341,235 +301,95 @@
                 <i class="fas fa-chart-line"></i>
                 <h1>HỆ THỐNG TÍNH KPI</h1>
             </div>
-            <p class="subtitle">Công cụ tính KPI trưởng bộ phận - Đơn giản & Hiệu quả</p>
+            <p>Công cụ tính KPI trưởng bộ phận</p>
+            
+            <div class="admin-link">
+                <a href="admin.html" class="btn btn-secondary">
+                    <i class="fas fa-cog"></i> Quản trị
+                </a>
+            </div>
+            
+            <div class="current-config">
+                <div><i class="fas fa-info-circle"></i> Trọng số KPI hiện tại</div>
+                <div class="config-info" id="currentConfig">
+                    <!-- Hiển thị config hiện tại -->
+                </div>
+            </div>
         </header>
         
         <div class="main-content">
-            <!-- Phần cấu hình trọng số -->
-            <div class="config-section">
-                <h2 class="section-title">
-                    <i class="fas fa-sliders-h"></i> CẤU HÌNH TRỌNG SỐ
-                </h2>
-                
-                <div class="month-selector">
-                    <label for="configMonth"><strong>KPI Tháng:</strong></label>
-                    <select id="configMonth">
-                        <option value="1">Tháng 1</option>
-                        <option value="2">Tháng 2</option>
-                        <option value="3">Tháng 3</option>
-                        <option value="4">Tháng 4</option>
-                        <option value="5">Tháng 5</option>
-                        <option value="6">Tháng 6</option>
-                        <option value="7">Tháng 7</option>
-                        <option value="8">Tháng 8</option>
-                        <option value="9">Tháng 9</option>
-                        <option value="10">Tháng 10</option>
-                        <option value="11" selected>Tháng 11</option>
-                        <option value="12">Tháng 12</option>
-                    </select>
+            <h2 class="section-title">
+                <i class="fas fa-calculator"></i> TÍNH KPI CÁ NHÂN
+            </h2>
+            
+            <div class="month-info" id="monthInfo">
+                <!-- Hiển thị thông tin tháng -->
+            </div>
+            
+            <div class="kpi-selection">
+                <div class="kpi-option" data-kpi="thuly-sec">
+                    <input type="checkbox" id="kpiThulySec">
+                    <label for="kpiThulySec">Thụ lý SEC</label>
                 </div>
-                
-                <div class="config-grid">
-                    <div class="config-item">
-                        <div class="config-header">
-                            <div class="config-name">Thụ lý SEC</div>
-                        </div>
-                        <div class="weights">
-                            <div class="weight-input">
-                                <label>Tỷ trọng nội bộ</label>
-                                <input type="number" id="internalWeight1" min="0" max="100" value="30">
-                            </div>
-                            <div class="weight-input">
-                                <label>Tỉ trọng cấp 1</label>
-                                <input type="number" id="level1Weight1" min="0" max="100" value="50">
-                            </div>
-                            <div class="weight-input">
-                                <label>Tỉ trọng cấp 2</label>
-                                <input type="number" id="level2Weight1" min="0" max="100" value="100">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="config-item">
-                        <div class="config-header">
-                            <div class="config-name">Thụ lý UNS</div>
-                        </div>
-                        <div class="weights">
-                            <div class="weight-input">
-                                <label>Tỷ trọng nội bộ</label>
-                                <input type="number" id="internalWeight2" min="0" max="100" value="30">
-                            </div>
-                            <div class="weight-input">
-                                <label>Tỉ trọng cấp 1</label>
-                                <input type="number" id="level1Weight2" min="0" max="100" value="50">
-                            </div>
-                            <div class="weight-input">
-                                <label>Tỉ trọng cấp 2</label>
-                                <input type="number" id="level2Weight2" min="0" max="100" value="80">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="config-item">
-                        <div class="config-header">
-                            <div class="config-name">Bản án UNS</div>
-                        </div>
-                        <div class="weights">
-                            <div class="weight-input">
-                                <label>Tỷ trọng nội bộ</label>
-                                <input type="number" id="internalWeight3" min="0" max="100" value="30">
-                            </div>
-                            <div class="weight-input">
-                                <label>Tỉ trọng cấp 1</label>
-                                <input type="number" id="level1Weight3" min="0" max="100" value="50">
-                            </div>
-                            <div class="weight-input">
-                                <label>Tỉ trọng cấp 2</label>
-                                <input type="number" id="level2Weight3" min="0" max="100" value="20">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="config-item">
-                        <div class="config-header">
-                            <div class="config-name">Số thu SEC</div>
-                        </div>
-                        <div class="weights">
-                            <div class="weight-input">
-                                <label>Tỷ trọng nội bộ</label>
-                                <input type="number" id="internalWeight4" min="0" max="100" value="70">
-                            </div>
-                            <div class="weight-input">
-                                <label>Tỉ trọng cấp 1</label>
-                                <input type="number" id="level1Weight4" min="0" max="100" value="60">
-                            </div>
-                            <div class="weight-input">
-                                <label>Tỉ trọng cấp 2</label>
-                                <input type="number" id="level2Weight4" min="0" max="100" value="100">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="config-item">
-                        <div class="config-header">
-                            <div class="config-name">Số thu UNS</div>
-                        </div>
-                        <div class="weights">
-                            <div class="weight-input">
-                                <label>Tỷ trọng nội bộ</label>
-                                <input type="number" id="internalWeight5" min="0" max="100" value="70">
-                            </div>
-                            <div class="weight-input">
-                                <label>Tỉ trọng cấp 1</label>
-                                <input type="number" id="level1Weight5" min="0" max="100" value="40">
-                            </div>
-                            <div class="weight-input">
-                                <label>Tỉ trọng cấp 2</label>
-                                <input type="number" id="level2Weight5" min="0" max="100" value="100">
-                            </div>
-                        </div>
-                    </div>
+                <div class="kpi-option" data-kpi="thuly-uns">
+                    <input type="checkbox" id="kpiThulyUns">
+                    <label for="kpiThulyUns">Thụ lý UNS</label>
                 </div>
-                
-                <div class="controls">
-                    <button class="btn btn-success" id="saveConfig">
-                        <i class="fas fa-save"></i> Lưu Cấu Hình
-                    </button>
-                    <button class="btn btn-primary" id="resetConfig">
-                        <i class="fas fa-undo"></i> Mặc Định
-                    </button>
+                <div class="kpi-option" data-kpi="ba-uns">
+                    <input type="checkbox" id="kpiBaUns">
+                    <label for="kpiBaUns">Bản án UNS</label>
+                </div>
+                <div class="kpi-option" data-kpi="sothu-sec">
+                    <input type="checkbox" id="kpiSothuSec">
+                    <label for="kpiSothuSec">Số thu SEC</label>
+                </div>
+                <div class="kpi-option" data-kpi="sothu-uns">
+                    <input type="checkbox" id="kpiSothuUns">
+                    <label for="kpiSothuUns">Số thu UNS</label>
                 </div>
             </div>
             
-            <!-- Phần tính KPI -->
-            <div class="calc-section">
-                <h2 class="section-title">
-                    <i class="fas fa-calculator"></i> TÍNH KPI CÁ NHÂN
-                </h2>
-                
-                <div class="month-selector">
-                    <label for="calcMonth"><strong>KPI Tháng:</strong></label>
-                    <select id="calcMonth">
-                        <option value="1">Tháng 1</option>
-                        <option value="2">Tháng 2</option>
-                        <option value="3">Tháng 3</option>
-                        <option value="4">Tháng 4</option>
-                        <option value="5">Tháng 5</option>
-                        <option value="6">Tháng 6</option>
-                        <option value="7">Tháng 7</option>
-                        <option value="8">Tháng 8</option>
-                        <option value="9">Tháng 9</option>
-                        <option value="10">Tháng 10</option>
-                        <option value="11" selected>Tháng 11</option>
-                        <option value="12">Tháng 12</option>
-                    </select>
-                </div>
-                
-                <div class="kpi-selection">
-                    <div class="kpi-option" data-kpi="thuly-sec">
-                        <input type="checkbox" id="kpiThulySec">
-                        <label for="kpiThulySec">Thụ lý SEC</label>
-                    </div>
-                    <div class="kpi-option" data-kpi="thuly-uns">
-                        <input type="checkbox" id="kpiThulyUns">
-                        <label for="kpiThulyUns">Thụ lý UNS</label>
-                    </div>
-                    <div class="kpi-option" data-kpi="ba-uns">
-                        <input type="checkbox" id="kpiBaUns">
-                        <label for="kpiBaUns">Bản án UNS</label>
-                    </div>
-                    <div class="kpi-option" data-kpi="sothu-sec">
-                        <input type="checkbox" id="kpiSothuSec">
-                        <label for="kpiSothuSec">Số thu SEC</label>
-                    </div>
-                    <div class="kpi-option" data-kpi="sothu-uns">
-                        <input type="checkbox" id="kpiSothuUns">
-                        <label for="kpiSothuUns">Số thu UNS</label>
-                    </div>
-                </div>
-                
-                <table id="kpiTable">
-                    <thead>
-                        <tr>
-                            <th>Chỉ tiêu</th>
-                            <th>KPI Giao</th>
-                            <th>Thực hiện</th>
-                            <th>% Hoàn thành</th>
-                            <th>KPI FINAL</th>
-                        </tr>
-                    </thead>
-                    <tbody id="kpiTableBody">
-                        <!-- Dữ liệu sẽ được thêm động bằng JavaScript -->
-                    </tbody>
-                    <tfoot>
-                        <tr class="total-row">
-                            <td style="text-align: right; font-weight: bold;">TỔNG CỘNG</td>
-                            <td></td>
-                            <td></td>
-                            <td id="totalPercent">0%</td>
-                            <td id="totalFinal" class="result">0%</td>
-                        </tr>
-                    </tfoot>
-                </table>
-                
-                <div class="summary" id="summary">
-                    <h3><i class="fas fa-chart-pie"></i> TỔNG KẾT KPI</h3>
-                    <p id="summaryText">Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.</p>
-                </div>
-                
-                <div class="controls">
-                    <button class="btn btn-primary" id="saveData">
-                        <i class="fas fa-save"></i> Lưu Dữ Liệu
-                    </button>
-                    <button class="btn btn-success" id="calculate">
-                        <i class="fas fa-calculator"></i> Tính KPI
-                    </button>
-                </div>
+            <table id="kpiTable">
+                <thead>
+                    <tr>
+                        <th>Chỉ tiêu</th>
+                        <th>KPI Giao</th>
+                        <th>Thực hiện</th>
+                        <th>% Hoàn thành</th>
+                        <th>KPI FINAL</th>
+                    </tr>
+                </thead>
+                <tbody id="kpiTableBody">
+                    <!-- Dữ liệu sẽ được thêm động bằng JavaScript -->
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td style="text-align: right; font-weight: bold;">TỔNG CỘNG</td>
+                        <td></td>
+                        <td></td>
+                        <td id="totalPercent">0%</td>
+                        <td id="totalFinal" class="result">0%</td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <div class="summary" id="summary">
+                <h3><i class="fas fa-chart-pie"></i> TỔNG KẾT KPI</h3>
+                <p id="summaryText">Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.</p>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="saveData">
+                    <i class="fas fa-save"></i> Lưu Dữ Liệu
+                </button>
+                <button class="btn btn-success" id="calculate">
+                    <i class="fas fa-calculator"></i> Tính KPI
+                </button>
             </div>
         </div>
         
         <footer>
-            <p>Hệ thống tính KPI Trưởng Bộ Phận &copy; 2023 - Phiên bản Đơn giản</p>
+            <p>Hệ thống tính KPI Trưởng Bộ Phận &copy; 2023</p>
         </footer>
     </div>
     
@@ -579,53 +399,14 @@
     </div>
 
     <script>
-        // Dữ liệu mẫu
-        const defaultConfig = {
-            "thuly-sec": { 
-                name: "Thụ lý SEC",
-                internal: 30, 
-                level1: 50, 
-                level2: 100 
-            },
-            "thuly-uns": { 
-                name: "Thụ lý UNS",
-                internal: 30, 
-                level1: 50, 
-                level2: 80 
-            },
-            "ba-uns": { 
-                name: "Bản án UNS",
-                internal: 30, 
-                level1: 50, 
-                level2: 20 
-            },
-            "sothu-sec": { 
-                name: "Số thu SEC",
-                internal: 70, 
-                level1: 60, 
-                level2: 100 
-            },
-            "sothu-uns": { 
-                name: "Số thu UNS",
-                internal: 70, 
-                level1: 40, 
-                level2: 100 
-            }
-        };
-        
-        let currentConfig = JSON.parse(JSON.stringify(defaultConfig));
+        let currentConfig = {};
         let selectedKPIs = [];
+        let currentMonth = '';
         
         // Khởi tạo ứng dụng
         document.addEventListener('DOMContentLoaded', function() {
-            // Khôi phục dữ liệu từ localStorage nếu có
-            loadFromLocalStorage();
-            
-            // Thiết lập sự kiện cho nút lưu cấu hình
-            document.getElementById('saveConfig').addEventListener('click', saveConfig);
-            
-            // Thiết lập sự kiện cho nút khôi phục mặc định
-            document.getElementById('resetConfig').addEventListener('click', resetConfig);
+            // Tải cấu hình từ localStorage
+            loadConfig();
             
             // Thiết lập sự kiện cho nút lưu dữ liệu
             document.getElementById('saveData').addEventListener('click', saveToLocalStorage);
@@ -655,74 +436,79 @@
             updateKPITable();
         });
         
-        // Lưu cấu hình
-        function saveConfig() {
-            // Cập nhật currentConfig từ các input
-            currentConfig["thuly-sec"].internal = parseFloat(document.getElementById('internalWeight1').value);
-            currentConfig["thuly-sec"].level1 = parseFloat(document.getElementById('level1Weight1').value);
-            currentConfig["thuly-sec"].level2 = parseFloat(document.getElementById('level2Weight1').value);
+        // Tải cấu hình
+        function loadConfig() {
+            const savedConfig = localStorage.getItem('kpiConfig');
+            if (savedConfig) {
+                const configData = JSON.parse(savedConfig);
+                currentConfig = configData.config || getDefaultConfig();
+                currentMonth = configData.month || 'Tháng 11';
+            } else {
+                currentConfig = getDefaultConfig();
+                currentMonth = 'Tháng 11';
+            }
             
-            currentConfig["thuly-uns"].internal = parseFloat(document.getElementById('internalWeight2').value);
-            currentConfig["thuly-uns"].level1 = parseFloat(document.getElementById('level1Weight2').value);
-            currentConfig["thuly-uns"].level2 = parseFloat(document.getElementById('level2Weight2').value);
-            
-            currentConfig["ba-uns"].internal = parseFloat(document.getElementById('internalWeight3').value);
-            currentConfig["ba-uns"].level1 = parseFloat(document.getElementById('level1Weight3').value);
-            currentConfig["ba-uns"].level2 = parseFloat(document.getElementById('level2Weight3').value);
-            
-            currentConfig["sothu-sec"].internal = parseFloat(document.getElementById('internalWeight4').value);
-            currentConfig["sothu-sec"].level1 = parseFloat(document.getElementById('level1Weight4').value);
-            currentConfig["sothu-sec"].level2 = parseFloat(document.getElementById('level2Weight4').value);
-            
-            currentConfig["sothu-uns"].internal = parseFloat(document.getElementById('internalWeight5').value);
-            currentConfig["sothu-uns"].level1 = parseFloat(document.getElementById('level1Weight5').value);
-            currentConfig["sothu-uns"].level2 = parseFloat(document.getElementById('level2Weight5').value);
-            
-            // Lưu vào localStorage
-            saveToLocalStorage();
-            
-            // Hiển thị thông báo
-            showNotification('Cấu hình đã được lưu thành công!', 'success');
-            
-            // Cập nhật bảng KPI
-            updateKPITable();
+            updateConfigDisplay();
         }
         
-        // Khôi phục cấu hình mặc định
-        function resetConfig() {
-            if (confirm('Bạn có chắc chắn muốn khôi phục cấu hình mặc định?')) {
-                currentConfig = JSON.parse(JSON.stringify(defaultConfig));
+        // Cấu hình mặc định
+        function getDefaultConfig() {
+            return {
+                "thuly-sec": { 
+                    name: "Thụ lý SEC",
+                    internal: 30, 
+                    level1: 50, 
+                    level2: 100 
+                },
+                "thuly-uns": { 
+                    name: "Thụ lý UNS",
+                    internal: 30, 
+                    level1: 50, 
+                    level2: 80 
+                },
+                "ba-uns": { 
+                    name: "Bản án UNS",
+                    internal: 30, 
+                    level1: 50, 
+                    level2: 20 
+                },
+                "sothu-sec": { 
+                    name: "Số thu SEC",
+                    internal: 70, 
+                    level1: 60, 
+                    level2: 100 
+                },
+                "sothu-uns": { 
+                    name: "Số thu UNS",
+                    internal: 70, 
+                    level1: 40, 
+                    level2: 100 
+                }
+            };
+        }
+        
+        // Cập nhật hiển thị cấu hình
+        function updateConfigDisplay() {
+            const monthInfo = document.getElementById('monthInfo');
+            const configContainer = document.getElementById('currentConfig');
+            
+            monthInfo.innerHTML = `<i class="fas fa-calendar-alt"></i> ${currentMonth}`;
+            configContainer.innerHTML = '';
+            
+            Object.keys(currentConfig).forEach(kpi => {
+                const config = currentConfig[kpi];
+                const configItem = document.createElement('div');
+                configItem.className = 'config-item';
                 
-                // Cập nhật các input
-                document.getElementById('internalWeight1').value = currentConfig["thuly-sec"].internal;
-                document.getElementById('level1Weight1').value = currentConfig["thuly-sec"].level1;
-                document.getElementById('level2Weight1').value = currentConfig["thuly-sec"].level2;
+                configItem.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">${config.name}</div>
+                    <div style="font-size: 12px;">
+                        NB: ${config.internal}% | C1: ${config.level1}% | C2: ${config.level2}%
+                    </div>
+                `;
                 
-                document.getElementById('internalWeight2').value = currentConfig["thuly-uns"].internal;
-                document.getElementById('level1Weight2').value = currentConfig["thuly-uns"].level1;
-                document.getElementById('level2Weight2').value = currentConfig["thuly-uns"].level2;
-                
-                document.getElementById('internalWeight3').value = currentConfig["ba-uns"].internal;
-                document.getElementById('level1Weight3').value = currentConfig["ba-uns"].level1;
-                document.getElementById('level2Weight3').value = currentConfig["ba-uns"].level2;
-                
-                document.getElementById('internalWeight4').value = currentConfig["sothu-sec"].internal;
-                document.getElementById('level1Weight4').value = currentConfig["sothu-sec"].level1;
-                document.getElementById('level2Weight4').value = currentConfig["sothu-sec"].level2;
-                
-                document.getElementById('internalWeight5').value = currentConfig["sothu-uns"].internal;
-                document.getElementById('level1Weight5').value = currentConfig["sothu-uns"].level1;
-                document.getElementById('level2Weight5').value = currentConfig["sothu-uns"].level2;
-                
-                // Lưu vào localStorage
-                saveToLocalStorage();
-                
-                // Hiển thị thông báo
-                showNotification('Đã khôi phục cấu hình mặc định!', 'success');
-                
-                // Cập nhật bảng KPI
-                updateKPITable();
-            }
+                configContainer.appendChild(configItem);
+            });
         }
         
         // Cập nhật bảng KPI
@@ -734,11 +520,8 @@
                 const row = document.createElement('tr');
                 const config = currentConfig[kpi];
                 
-                // Xác định tên chỉ tiêu
-                let indicatorName = config.name;
-                
                 row.innerHTML = `
-                    <td>${indicatorName}</td>
+                    <td>${config.name}</td>
                     <td><input type="number" id="kpi_${kpi}" placeholder="Nhập KPI" step="0.01" min="0"></td>
                     <td><input type="number" id="actual_${kpi}" placeholder="Nhập thực hiện" step="0.01" min="0"></td>
                     <td id="percent_${kpi}">0%</td>
@@ -858,7 +641,6 @@
         // Lưu dữ liệu vào localStorage
         function saveToLocalStorage() {
             const data = {
-                config: currentConfig,
                 selectedKPIs: selectedKPIs,
                 kpiValues: {}
             };
@@ -870,38 +652,16 @@
                 data.kpiValues[kpi] = { kpi: kpiValue, actual: actualValue };
             });
             
-            localStorage.setItem('kpiSystemData', JSON.stringify(data));
+            localStorage.setItem('kpiUserData', JSON.stringify(data));
             showNotification('Dữ liệu đã được lưu thành công!', 'success');
         }
         
         // Tải dữ liệu từ localStorage
-        function loadFromLocalStorage() {
-            const savedData = localStorage.getItem('kpiSystemData');
+        function loadUserData() {
+            const savedData = localStorage.getItem('kpiUserData');
             if (savedData) {
                 const data = JSON.parse(savedData);
-                currentConfig = data.config || currentConfig;
                 selectedKPIs = data.selectedKPIs || [];
-                
-                // Cập nhật các input trong phần cấu hình
-                document.getElementById('internalWeight1').value = currentConfig["thuly-sec"].internal;
-                document.getElementById('level1Weight1').value = currentConfig["thuly-sec"].level1;
-                document.getElementById('level2Weight1').value = currentConfig["thuly-sec"].level2;
-                
-                document.getElementById('internalWeight2').value = currentConfig["thuly-uns"].internal;
-                document.getElementById('level1Weight2').value = currentConfig["thuly-uns"].level1;
-                document.getElementById('level2Weight2').value = currentConfig["thuly-uns"].level2;
-                
-                document.getElementById('internalWeight3').value = currentConfig["ba-uns"].internal;
-                document.getElementById('level1Weight3').value = currentConfig["ba-uns"].level1;
-                document.getElementById('level2Weight3').value = currentConfig["ba-uns"].level2;
-                
-                document.getElementById('internalWeight4').value = currentConfig["sothu-sec"].internal;
-                document.getElementById('level1Weight4').value = currentConfig["sothu-sec"].level1;
-                document.getElementById('level2Weight4').value = currentConfig["sothu-sec"].level2;
-                
-                document.getElementById('internalWeight5').value = currentConfig["sothu-uns"].internal;
-                document.getElementById('level1Weight5').value = currentConfig["sothu-uns"].level1;
-                document.getElementById('level2Weight5').value = currentConfig["sothu-uns"].level2;
                 
                 // Cập nhật các checkbox KPI
                 document.querySelectorAll('.kpi-option input[type="checkbox"]').forEach(checkbox => {
@@ -934,8 +694,6 @@
                         });
                     }, 100);
                 }
-                
-                showNotification('Đã tải dữ liệu thành công!', 'success');
             }
         }
     </script>
