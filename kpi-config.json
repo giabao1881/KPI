@@ -1,0 +1,35 @@
+{
+  "month": "Tháng 11 - 2023",
+  "config": {
+    "thuly-sec": {
+      "name": "Thụ lý SEC",
+      "internal": 30,
+      "level1": 50,
+      "level2": 100
+    },
+    "thuly-uns": {
+      "name": "Thụ lý UNS",
+      "internal": 30,
+      "level1": 50,
+      "level2": 80
+    },
+    "ba-uns": {
+      "name": "Bản án UNS",
+      "internal": 30,
+      "level1": 50,
+      "level2": 20
+    },
+    "sothu-sec": {
+      "name": "Số thu SEC",
+      "internal": 70,
+      "level1": 60,
+      "level2": 100
+    },
+    "sothu-uns": {
+      "name": "Số thu UNS",
+      "internal": 70,
+      "level1": 40,
+      "level2": 100
+    }
+  }
+}
