@@ -278,13 +278,13 @@
         .performance-poor { background-color: #f8d7da; color: #721c24; }
         
         .last-update {
-    font-size: 12px;
-    color: #ffffff;
-    margin-top: 5px;
-    text-align: center;
-    font-weight: bold;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3); /* Thêm shadow để chữ nổi bật */
-}
+            font-size: 12px;
+            color: #ffffff;
+            margin-top: 5px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
         
         @media (max-width: 768px) {
             .kpi-selection {
@@ -308,12 +308,8 @@
             
             <div class="config-info">
                 <div><i class="fas fa-info-circle"></i> Trọng số KPI hiện tại (Tự động cập nhật)</div>
-                <div class="config-grid" id="currentConfig">
-                    <!-- Hiển thị config hiện tại -->
-                </div>
-                <div class="last-update" id="lastUpdate">
-                    <!-- Hiển thị thời gian cập nhật -->
-                </div>
+                <div class="config-grid" id="currentConfig"></div>
+                <div class="last-update" id="lastUpdate"></div>
             </div>
         </header>
         
@@ -322,9 +318,7 @@
                 <i class="fas fa-calculator"></i> TÍNH KPI CÁ NHÂN
             </h2>
             
-            <div class="month-info" id="monthInfo">
-                <!-- Hiển thị thông tin tháng -->
-            </div>
+            <div class="month-info" id="monthInfo"></div>
             
             <div class="kpi-selection">
                 <div class="kpi-option" data-kpi="thuly-sec">
@@ -359,9 +353,7 @@
                         <th>KPI FINAL</th>
                     </tr>
                 </thead>
-                <tbody id="kpiTableBody">
-                    <!-- Dữ liệu sẽ được thêm động bằng JavaScript -->
-                </tbody>
+                <tbody id="kpiTableBody"></tbody>
                 <tfoot>
                     <tr class="total-row">
                         <td style="text-align: right; font-weight: bold;">TỔNG CỘNG</td>
@@ -375,7 +367,10 @@
             
             <div class="summary" id="summary">
                 <h3><i class="fas fa-chart-pie"></i> TỔNG KẾT KPI</h3>
-                <p id="summaryText">Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.<br><strong>Lưu ý:</strong> Nhập số chi tiết để ra kết quả chính xác nhất</p>
+                <p id="summaryText">
+                    Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.<br>
+                    <strong>Lưu ý:</strong> Nhập số chi tiết để ra kết quả chính xác nhất
+                </p>
             </div>
             
             <div class="controls">
@@ -399,34 +394,31 @@
     </div>
 
     <script>
-        // URL đến file config trên GitHub (bạn cần thay đổi thành URL thực tế)
         const CONFIG_URL = 'https://giabao1881.github.io/KPI/kpi-config.json';
         
         let currentConfig = {};
         let selectedKPIs = [];
         let currentMonth = '';
         
-        // Khởi tạo ứng dụng
         document.addEventListener('DOMContentLoaded', function() {
-            // Tải cấu hình từ GitHub
             loadConfigFromGitHub();
             
-            // Thiết lập sự kiện cho nút lưu dữ liệu
             document.getElementById('saveData').addEventListener('click', saveToLocalStorage);
-            
-            // Thiết lập sự kiện cho nút kiểm tra cập nhật
             document.getElementById('checkUpdate').addEventListener('click', loadConfigFromGitHub);
             
-            // Thiết lập sự kiện cho các checkbox KPI
             document.querySelectorAll('.kpi-option input[type="checkbox"]').forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
                     const kpiOption = this.closest('.kpi-option');
+                    const kpiKey = kpiOption.getAttribute('data-kpi');
+                    
                     if (this.checked) {
                         kpiOption.classList.add('selected');
-                        selectedKPIs.push(kpiOption.getAttribute('data-kpi'));
+                        if (!selectedKPIs.includes(kpiKey)) {
+                            selectedKPIs.push(kpiKey);
+                        }
                     } else {
                         kpiOption.classList.remove('selected');
-                        const index = selectedKPIs.indexOf(kpiOption.getAttribute('data-kpi'));
+                        const index = selectedKPIs.indexOf(kpiKey);
                         if (index > -1) {
                             selectedKPIs.splice(index, 1);
                         }
@@ -435,43 +427,34 @@
                 });
             });
             
-            // Tự động kiểm tra cập nhật mỗi 5 phút
             setInterval(loadConfigFromGitHub, 5 * 60 * 1000);
         });
         
-        // Tải cấu hình từ GitHub
         async function loadConfigFromGitHub() {
             try {
                 showNotification('Đang tải cấu hình mới nhất từ GitHub...', 'info');
                 
                 const response = await fetch(CONFIG_URL + '?t=' + new Date().getTime());
-                
-                if (!response.ok) {
-                    throw new Error('Không thể tải cấu hình từ GitHub');
-                }
+                if (!response.ok) throw new Error('Không thể tải cấu hình từ GitHub');
                 
                 const configData = await response.json();
                 currentConfig = configData.config;
                 currentMonth = configData.month;
                 
-                // Lưu vào localStorage để dùng khi offline
                 localStorage.setItem('kpiConfig', JSON.stringify(configData));
                 localStorage.setItem('kpiConfigLastUpdate', new Date().toLocaleString('vi-VN'));
                 
                 updateConfigDisplay();
-                updateKPITable();hi
+                updateKPITable();
                 
                 showNotification('Đã cập nhật cấu hình mới nhất!', 'success');
-                
             } catch (error) {
                 console.error('Lỗi khi tải cấu hình:', error);
-                // Nếu không tải được từ GitHub, dùng bản trong localStorage
                 loadConfigFromLocalStorage();
                 showNotification('Đang sử dụng cấu hình cũ (lỗi kết nối GitHub)', 'info');
             }
         }
         
-        // Tải cấu hình từ localStorage
         function loadConfigFromLocalStorage() {
             const savedConfig = localStorage.getItem('kpiConfig');
             const lastUpdate = localStorage.getItem('kpiConfigLastUpdate');
@@ -482,14 +465,12 @@
                 currentMonth = configData.month;
                 updateConfigDisplay(lastUpdate);
             } else {
-                // Nếu không có config nào, dùng mặc định
                 currentConfig = getDefaultConfig();
                 currentMonth = 'Tháng 11';
                 updateConfigDisplay();
             }
         }
         
-        // Cấu hình mặc định (dự phòng)
         function getDefaultConfig() {
             return {
                 "thuly-sec": { 
@@ -525,7 +506,6 @@
             };
         }
         
-        // Cập nhật hiển thị cấu hình
         function updateConfigDisplay(lastUpdate = null) {
             const monthInfo = document.getElementById('monthInfo');
             const configContainer = document.getElementById('currentConfig');
@@ -555,13 +535,76 @@
                 lastUpdateElement.textContent = `Cập nhật lần cuối: ${new Date().toLocaleString('vi-VN')}`;
             }
         }
+
+        // ✅ Trọng số chi tiết – dồn qua lại giữa SEC & UNS trong cùng nhóm
+        function getDetailWeight(kpi) {
+            const config = currentConfig[kpi];
+            if (!config) return 0;
+
+            // Trọng số gốc từ config (NB * C1 * C2)
+            let weight =
+                (config.internal / 100) *
+                (config.level1 / 100) *
+                (config.level2 / 100);
+
+            // ===== NHÓM THỤ LÝ =====
+            if (kpi === 'thuly-uns') {
+                // Nếu có UNS, không chọn SEC → UNS ôm luôn phần SEC
+                const secConfig = currentConfig['thuly-sec'];
+                if (secConfig && !selectedKPIs.includes('thuly-sec')) {
+                    const secWeight =
+                        (secConfig.internal / 100) *
+                        (secConfig.level1 / 100) *
+                        (secConfig.level2 / 100);
+                    weight += secWeight;
+                }
+            }
+
+            if (kpi === 'thuly-sec') {
+                // Nếu có SEC, không chọn UNS → SEC ôm luôn phần UNS
+                const unsConfig = currentConfig['thuly-uns'];
+                if (unsConfig && !selectedKPIs.includes('thuly-uns')) {
+                    const unsWeight =
+                        (unsConfig.internal / 100) *
+                        (unsConfig.level1 / 100) *
+                        (unsConfig.level2 / 100);
+                    weight += unsWeight;
+                }
+            }
+
+            // ===== NHÓM SỐ THU =====
+            if (kpi === 'sothu-uns') {
+                // Nếu có UNS, không chọn SEC → UNS ôm luôn phần SEC
+                const secRevenueConfig = currentConfig['sothu-sec'];
+                if (secRevenueConfig && !selectedKPIs.includes('sothu-sec')) {
+                    const secRevenueWeight =
+                        (secRevenueConfig.internal / 100) *
+                        (secRevenueConfig.level1 / 100) *
+                        (secRevenueConfig.level2 / 100);
+                    weight += secRevenueWeight;
+                }
+            }
+
+            if (kpi === 'sothu-sec') {
+                // Nếu có SEC, không chọn UNS → SEC ôm luôn phần UNS
+                const unsRevenueConfig = currentConfig['sothu-uns'];
+                if (unsRevenueConfig && !selectedKPIs.includes('sothu-uns')) {
+                    const unsRevenueWeight =
+                        (unsRevenueConfig.internal / 100) *
+                        (unsRevenueConfig.level1 / 100) *
+                        (unsRevenueConfig.level2 / 100);
+                    weight += unsRevenueWeight;
+                }
+            }
+
+            return weight;
+        }
         
-        // Cập nhật bảng KPI
         function updateKPITable() {
             const tableBody = document.getElementById('kpiTableBody');
             tableBody.innerHTML = '';
             
-            selectedKPIs.forEach((kpi, index) => {
+            selectedKPIs.forEach(kpi => {
                 const row = document.createElement('tr');
                 const config = currentConfig[kpi];
                 
@@ -575,7 +618,6 @@
                 
                 tableBody.appendChild(row);
                 
-                // Thêm sự kiện tính toán tự động khi nhập liệu
                 const kpiInput = document.getElementById(`kpi_${kpi}`);
                 const actualInput = document.getElementById(`actual_${kpi}`);
                 
@@ -583,18 +625,13 @@
                 actualInput.addEventListener('input', calculateKPI);
             });
             
-            // Cập nhật tổng
             document.getElementById('totalPercent').textContent = '0%';
             document.getElementById('totalFinal').textContent = '0%';
             
-            // Cập nhật tổng kết
             updateSummary();
-            
-            // Tính toán lại nếu có dữ liệu cũ
             calculateKPI();
         }
         
-        // Tính toán KPI (tự động khi nhập liệu)
         function calculateKPI() {
             let totalPercent = 0;
             let totalFinal = 0;
@@ -606,22 +643,24 @@
                 const percentCell = document.getElementById(`percent_${kpi}`);
                 const finalCell = document.getElementById(`final_${kpi}`);
                 
-                const kpiValue = parseFloat(kpiInput.value) || 0;
-                const actualValue = parseFloat(actualInput.value) || 0;
-                const config = currentConfig[kpi];
+                const kpiValue = parseFloat(kpiInput?.value) || 0;
+                const actualValue = parseFloat(actualInput?.value) || 0;
                 
-                // Tính trọng số chi tiết (chuyển từ % sang số thập phân)
-                const detailWeight = (config.internal / 100) * (config.level1 / 100) * (config.level2 / 100);
+                const detailWeight = getDetailWeight(kpi);
                 
                 let percent = 0;
                 if (kpiValue > 0) {
-                    percent = Math.min(actualValue / kpiValue, 1.5); // Giới hạn tối đa 150%
+                    percent = Math.min(actualValue / kpiValue, 1.5);
                 }
                 
-                const final = percent * detailWeight * 100; // Chuyển sang %
+                const final = percent * detailWeight * 100;
                 
-                percentCell.textContent = (percent * 100).toFixed(2) + '%';
-                finalCell.textContent = final.toFixed(2) + '%';
+                if (percentCell) {
+                    percentCell.textContent = (percent * 100).toFixed(2) + '%';
+                }
+                if (finalCell) {
+                    finalCell.textContent = final.toFixed(2) + '%';
+                }
                 
                 if (kpiValue > 0) {
                     totalPercent += percent;
@@ -630,18 +669,16 @@
                 }
             });
             
-            // Cập nhật tổng
             const avgPercent = validRows > 0 ? totalPercent / validRows : 0;
             document.getElementById('totalPercent').textContent = (avgPercent * 100).toFixed(2) + '%';
             document.getElementById('totalFinal').textContent = totalFinal.toFixed(2) + '%';
             
-            // Cập nhật tổng kết
             updateSummary();
         }
         
-        // Cập nhật phần tổng kết
         function updateSummary() {
-            const totalFinal = parseFloat(document.getElementById('totalFinal').textContent) || 0;
+            const totalFinalText = document.getElementById('totalFinal').textContent || '0';
+            const totalFinal = parseFloat(totalFinalText.replace('%', '')) || 0;
             const summaryText = document.getElementById('summaryText');
             const summary = document.getElementById('summary');
             
@@ -655,17 +692,16 @@
                 let performanceLevel = '';
                 let performanceClass = '';
                 
-                // Tìm đoạn code này:
-if (totalFinal >= 100) {
-    performanceLevel = '10H CÓ MẶT CTY';
-    performanceClass = 'performance-excellent';
-} else if (totalFinal >= 80) {    // ĐÃ SỬA THÀNH 80%
-    performanceLevel = 'HÚ HỒN CHIM ÉN';
-    performanceClass = 'performance-average';
-} else {
-    performanceLevel = 'SẮP COOK RỒI';
-    performanceClass = 'performance-poor';
-}
+                if (totalFinal >= 100) {
+                    performanceLevel = '10H CÓ MẶT CTY';
+                    performanceClass = 'performance-excellent';
+                } else if (totalFinal >= 80) {
+                    performanceLevel = 'HÚ HỒN CHIM ÉN';
+                    performanceClass = 'performance-average';
+                } else {
+                    performanceLevel = 'SẮP COOK RỒI';
+                    performanceClass = 'performance-poor';
+                }
                 
                 summaryText.innerHTML = `
                     Tổng điểm KPI của bạn là <strong>${totalFinal.toFixed(2)}%</strong>.<br>
@@ -675,7 +711,6 @@ if (totalFinal >= 100) {
             }
         }
         
-        // Hiển thị thông báo
         function showNotification(message, type) {
             const notification = document.getElementById('notification');
             const notificationText = document.getElementById('notificationText');
@@ -688,14 +723,12 @@ if (totalFinal >= 100) {
             }, 3000);
         }
         
-        // Lưu dữ liệu vào localStorage
         function saveToLocalStorage() {
             const data = {
                 selectedKPIs: selectedKPIs,
                 kpiValues: {}
             };
             
-            // Lưu giá trị KPI và thực hiện
             selectedKPIs.forEach(kpi => {
                 const kpiValue = document.getElementById(`kpi_${kpi}`)?.value || '';
                 const actualValue = document.getElementById(`actual_${kpi}`)?.value || '';
@@ -706,14 +739,12 @@ if (totalFinal >= 100) {
             showNotification('Dữ liệu cá nhân đã được lưu thành công!', 'success');
         }
         
-        // Tải dữ liệu từ localStorage
         function loadUserData() {
             const savedData = localStorage.getItem('kpiUserData');
             if (savedData) {
                 const data = JSON.parse(savedData);
                 selectedKPIs = data.selectedKPIs || [];
                 
-                // Cập nhật các checkbox KPI
                 document.querySelectorAll('.kpi-option input[type="checkbox"]').forEach(checkbox => {
                     const kpiOption = checkbox.closest('.kpi-option');
                     const kpi = kpiOption.getAttribute('data-kpi');
@@ -727,10 +758,8 @@ if (totalFinal >= 100) {
                     }
                 });
                 
-                // Cập nhật bảng KPI
                 updateKPITable();
                 
-                // Khôi phục giá trị KPI và thực hiện
                 if (data.kpiValues) {
                     setTimeout(() => {
                         Object.keys(data.kpiValues).forEach(kpi => {
@@ -743,7 +772,6 @@ if (totalFinal >= 100) {
                             }
                         });
                         
-                        // Tính toán lại KPI
                         calculateKPI();
                     }, 100);
                 }
