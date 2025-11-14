@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Tính KPI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .logo i {
+            font-size: 36px;
+            color: var(--secondary);
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .config-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .config-item {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .month-info {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--primary);
+        }
+        
+        .kpi-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .kpi-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .kpi-option:hover {
+            background: #dfe6e9;
+        }
+        
+        .kpi-option.selected {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .kpi-option input {
+            width: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 10px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+            outline: none;
+        }
+        
+        .result {
+            font-weight: bold;
+            background-color: #e8f4fd;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: var(--light);
+        }
+        
+        .summary {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .summary h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: #666;
+            font-size: 14px;
+            background: var(--light);
+            border-top: 1px solid #ddd;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(150%);
+            transition: transform 0.5s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--success);
+        }
+        
+        .notification.info {
+            background-color: var(--secondary);
+        }
+        
+        .performance-excellent { background-color: #d4edda; color: #155724; }
+        .performance-good { background-color: #d1ecf1; color: #0c5460; }
+        .performance-average { background-color: #fff3cd; color: #856404; }
+        .performance-poor { background-color: #f8d7da; color: #721c24; }
+        
+        .last-update {
+            font-size: 12px;
+            color: #ffffff;
+            margin-top: 5px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .kpi-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>HỆ THỐNG TÍNH KPI</h1>
+            </div>
+            <p>Công cụ tính KPI - Tự động cập nhật</p>
+            
+            <div class="config-info">
+                <div><i class="fas fa-info-circle"></i> Trọng số KPI hiện tại (Tự động cập nhật)</div>
+                <div class="config-grid" id="currentConfig"></div>
+                <div class="last-update" id="lastUpdate"></div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <h2 class="section-title">
+                <i class="fas fa-calculator"></i> TÍNH KPI CÁ NHÂN
+            </h2>
+            
+            <div class="month-info" id="monthInfo"></div>
+            
+            <div class="kpi-selection">
+                <div class="kpi-option" data-kpi="thuly-sec">
+                    <input type="checkbox" id="kpiThulySec">
+                    <label for="kpiThulySec">Thụ lý SEC</label>
+                </div>
+                <div class="kpi-option" data-kpi="ba-sec">
+                    <input type="checkbox" id="kpiBaSec">
+                    <label for="kpiBaSec">Bản án SEC</label>
+                </div>
+                <div class="kpi-option" data-kpi="thuly-uns">
+                    <input type="checkbox" id="kpiThulyUns">
+                    <label for="kpiThulyUns">Thụ lý UNS</label>
+                </div>
+                <div class="kpi-option" data-kpi="ba-uns">
+                    <input type="checkbox" id="kpiBaUns">
+                    <label for="kpiBaUns">Bản án UNS</label>
+                </div>
+                <div class="kpi-option" data-kpi="sothu-sec">
+                    <input type="checkbox" id="kpiSothuSec">
+                    <label for="kpiSothuSec">Số thu SEC</label>
+                </div>
+                <div class="kpi-option" data-kpi="sothu-uns">
+                    <input type="checkbox" id="kpiSothuUns">
+                    <label for="kpiSothuUns">Số thu UNS</label>
+                </div>
+            </div>
+            
+            <table id="kpiTable">
+                <thead>
+                    <tr>
+                        <th>Chỉ tiêu</th>
+                        <th>KPI Giao</th>
+                        <th>Thực hiện</th>
+                        <th>% Hoàn thành</th>
+                        <th>NB thực tế</th>
+                        <th>KPI FINAL</th>
+                    </tr>
+                </thead>
+                <tbody id="kpiTableBody"></tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td style="text-align: right; font-weight: bold;">TỔNG CỘNG</td>
+                        <td></td>
+                        <td></td>
+                        <td id="totalPercent">0%</td>
+                        <td></td>
+                        <td id="totalFinal" class="result">0%</td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <div class="summary" id="summary">
+                <h3><i class="fas fa-chart-pie"></i> TỔNG KẾT KPI</h3>
+                <p id="summaryText">
+                    Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.<br>
+                    <strong>Lưu ý:</strong> Nhập số chi tiết để ra kết quả chính xác nhất
+                </p>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="saveData">
+                    <i class="fas fa-save"></i> Lưu Dữ Liệu Cá Nhân
+                </button>
+                <button class="btn btn-success" id="checkUpdate">
+                    <i class="fas fa-sync"></i> Kiểm Tra Cập Nhật
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Hệ thống tính KPI &copy; 2025 - Baotg10</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Thao tác thành công!</span>
+    </div>
+
+    <script>
+        // Link JSON config trên GitHub
+        const CONFIG_URL = 'https://giabao1881.github.io/KPI/kpi-config.json';
+        
+        let currentConfig = {};
+        let selectedKPIs = [];
+        let currentMonth = '';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfigFromGitHub();
+            
+            document.getElementById('saveData').addEventListener('click', saveToLocalStorage);
+            document.getElementById('checkUpdate').addEventListener('click', loadConfigFromGitHub);
+            
+            document.querySelectorAll('.kpi-option input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const kpiOption = this.closest('.kpi-option');
+                    const kpiKey = kpiOption.getAttribute('data-kpi');
+                    
+                    if (this.checked) {
+                        kpiOption.classList.add('selected');
+                        if (!selectedKPIs.includes(kpiKey)) {
+                            selectedKPIs.push(kpiKey);
+                        }
+                    } else {
+                        kpiOption.classList.remove('selected');
+                        const index = selectedKPIs.indexOf(kpiKey);
+                        if (index > -1) {
+                            selectedKPIs.splice(index, 1);
+                        }
+                    }
+                    updateKPITable();
+                });
+            });
+            
+            // Tự cập nhật config mỗi 5 phút
+            setInterval(loadConfigFromGitHub, 5 * 60 * 1000);
+        });
+        
+        // ========== LOAD CONFIG ==========
+        async function loadConfigFromGitHub() {
+            try {
+                showNotification('Đang tải cấu hình mới nhất từ GitHub...', 'info');
+                
+                const response = await fetch(CONFIG_URL + '?t=' + new Date().getTime());
+                if (!response.ok) throw new Error('Không thể tải cấu hình từ GitHub');
+                
+                const configData = await response.json();
+                currentConfig = configData.config || {};
+                currentMonth = configData.month || '';
+                
+                localStorage.setItem('kpiConfig', JSON.stringify(configData));
+                localStorage.setItem('kpiConfigLastUpdate', new Date().toLocaleString('vi-VN'));
+                
+                updateConfigDisplay();
+                loadUserData();
+                showNotification('Đã cập nhật cấu hình mới nhất!', 'success');
+            } catch (error) {
+                console.error('Lỗi khi tải cấu hình:', error);
+                loadConfigFromLocalStorage();
+                loadUserData();
+                showNotification('Đang sử dụng cấu hình cũ (lỗi kết nối GitHub)', 'info');
+            }
+        }
+        
+        function loadConfigFromLocalStorage() {
+            const savedConfig = localStorage.getItem('kpiConfig');
+            const lastUpdate = localStorage.getItem('kpiConfigLastUpdate');
+            
+            if (savedConfig) {
+                const configData = JSON.parse(savedConfig);
+                currentConfig = configData.config || {};
+                currentMonth = configData.month || '';
+                updateConfigDisplay(lastUpdate);
+            } else {
+                currentConfig = getDefaultConfig();
+                currentMonth = 'Tháng 11';
+                updateConfigDisplay();
+            }
+        }
+        
+        // Fallback khi không có JSON online / offline
+        function getDefaultConfig() {
+            return {
+                "thuly-sec": { 
+                    name: "Thụ lý SEC",
+                    internal: 30, 
+                    level1: 50, 
+                    level2: 80 
+                },
+                "ba-sec": {
+                    name: "Bản án SEC",
+                    internal: 30,
+                    level1: 50,
+                    level2: 20
+                },
+                "thuly-uns": { 
+                    name: "Thụ lý UNS",
+                    internal: 30, 
+                    level1: 50, 
+                    level2: 80 
+                },
+                "ba-uns": { 
+                    name: "Bản án UNS",
+                    internal: 30,
+                    level1: 50,
+                    level2: 20 
+                },
+                "sothu-sec": { 
+                    name: "Số thu SEC",
+                    internal: 70, 
+                    level1: 60, 
+                    level2: 100 
+                },
+                "sothu-uns": { 
+                    name: "Số thu UNS",
+                    internal: 70, 
+                    level1: 40, 
+                    level2: 100 
+                }
+            };
+        }
+        
+        function updateConfigDisplay(lastUpdate = null) {
+            const monthInfo = document.getElementById('monthInfo');
+            const configContainer = document.getElementById('currentConfig');
+            const lastUpdateElement = document.getElementById('lastUpdate');
+            
+            monthInfo.innerHTML = `<i class="fas fa-calendar-alt"></i> ${currentMonth || 'Chưa cấu hình tháng'}`;
+            configContainer.innerHTML = '';
+            
+            Object.keys(currentConfig).forEach(kpi => {
+                const config = currentConfig[kpi];
+                const configItem = document.createElement('div');
+                configItem.className = 'config-item';
+                
+                configItem.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">${config.name}</div>
+                    <div style="font-size: 12px;">
+                        NB: ${config.internal}% | C1: ${config.level1}% | C2: ${config.level2}%
+                    </div>
+                `;
+                
+                configContainer.appendChild(configItem);
+            });
+            
+            if (lastUpdate) {
+                lastUpdateElement.textContent = `Cập nhật lần cuối: ${lastUpdate}`;
+            } else {
+                lastUpdateElement.textContent = `Cập nhật lần cuối: ${new Date().toLocaleString('vi-VN')}`;
+            }
+        }
+
+        // ====== HÀM TÍNH NB THỰC TẾ (0–1, chưa nhân C1/C2) ======
+        function getInternalFraction(kpi) {
+            const cfg = currentConfig[kpi];
+            if (!cfg) return 0;
+
+            // ===== Nhóm THỤ LÝ: thuly-sec, ba-sec, thuly-uns, ba-uns =====
+            if (
+                kpi === 'thuly-sec' ||
+                kpi === 'ba-sec'    ||
+                kpi === 'thuly-uns' ||
+                kpi === 'ba-uns'
+            ) {
+                // 1) Lấy "tổng Thụ lý" từ config (ưu tiên thuly-uns → thuly-sec → ba-uns → ba-sec)
+                let totalInternalPercent = 0;
+                if (currentConfig['thuly-uns'] && currentConfig['thuly-uns'].internal) {
+                    totalInternalPercent = currentConfig['thuly-uns'].internal;
+                } else if (currentConfig['thuly-sec'] && currentConfig['thuly-sec'].internal) {
+                    totalInternalPercent = currentConfig['thuly-sec'].internal;
+                } else if (currentConfig['ba-uns'] && currentConfig['ba-uns'].internal) {
+                    totalInternalPercent = currentConfig['ba-uns'].internal;
+                } else if (currentConfig['ba-sec'] && currentConfig['ba-sec'].internal) {
+                    totalInternalPercent = currentConfig['ba-sec'].internal;
+                }
+
+                const thulyBase = totalInternalPercent / 100; // ví dụ 30% → 0.3
+
+                const hasThulySec = selectedKPIs.includes('thuly-sec');
+                const hasBaSec    = selectedKPIs.includes('ba-sec');
+                const hasThulyUns = selectedKPIs.includes('thuly-uns');
+                const hasBaUns    = selectedKPIs.includes('ba-uns');
+
+                const hasSecSide = hasThulySec || hasBaSec;
+                const hasUnsSide = hasThulyUns || hasBaUns;
+
+                if (!hasSecSide && !hasUnsSide) return 0;
+
+                // 2) Chia rổ Thụ lý giữa "nhánh SEC" và "nhánh UNS" theo level1 (thuly-sec vs thuly-uns)
+                const secCfg = currentConfig['thuly-sec'] || {};
+                const unsCfg = currentConfig['thuly-uns'] || {};
+
+                const secL1 = hasSecSide ? (secCfg.level1 || 0) : 0;
+                const unsL1 = hasUnsSide ? (unsCfg.level1 || 0) : 0;
+                const sumL1 = secL1 + unsL1;
+
+                let secBlockShare = 0; // phần rổ Thụ lý cho nhánh SEC (thuly-sec + ba-sec)
+                let unsBlockShare = 0; // phần rổ Thụ lý cho nhánh UNS (thuly-uns + ba-uns)
+
+                if (hasSecSide && hasUnsSide) {
+                    if (sumL1 > 0) {
+                        secBlockShare = secL1 / sumL1;
+                        unsBlockShare = unsL1 / sumL1;
+                    } else {
+                        secBlockShare = 0.5;
+                        unsBlockShare = 0.5;
+                    }
+                } else if (hasSecSide && !hasUnsSide) {
+                    secBlockShare = 1;
+                    unsBlockShare = 0;
+                } else if (!hasSecSide && hasUnsSide) {
+                    secBlockShare = 0;
+                    unsBlockShare = 1;
+                }
+
+                // 3) Trong nhánh SEC: chia thuly-sec vs ba-sec theo level2
+                const baSecCfg = currentConfig['ba-sec'] || {};
+                const secSplitBase   = hasThulySec ? (secCfg.level2   || 0) : 0;
+                const baSecSplitBase = hasBaSec    ? (baSecCfg.level2 || 0) : 0;
+                const secSplitTotal  = secSplitBase + baSecSplitBase;
+
+                let thulySecRatio = 0;
+                let baSecRatio    = 0;
+
+                if (secSplitTotal > 0) {
+                    thulySecRatio = secSplitBase / secSplitTotal;
+                    baSecRatio    = baSecSplitBase / secSplitTotal;
+                } else {
+                    if (hasThulySec && !hasBaSec) {
+                        thulySecRatio = 1;
+                        baSecRatio    = 0;
+                    }
+                    if (hasBaSec && !hasThulySec) {
+                        thulySecRatio = 0;
+                        baSecRatio    = 1;
+                    }
+                }
+
+                // 4) Trong nhánh UNS: chia thuly-uns vs ba-uns theo level2
+                const baUnsCfg = currentConfig['ba-uns'] || {};
+                const unsSplitBase   = hasThulyUns ? (unsCfg.level2   || 0) : 0;
+                const baUnsSplitBase = hasBaUns    ? (baUnsCfg.level2 || 0) : 0;
+                const unsSplitTotal  = unsSplitBase + baUnsSplitBase;
+
+                let thulyUnsRatio = 0;
+                let baUnsRatio    = 0;
+
+                if (unsSplitTotal > 0) {
+                    thulyUnsRatio = unsSplitBase / unsSplitTotal;
+                    baUnsRatio    = baUnsSplitBase / unsSplitTotal;
+                } else {
+                    if (hasThulyUns && !hasBaUns) {
+                        thulyUnsRatio = 1;
+                        baUnsRatio    = 0;
+                    }
+                    if (hasBaUns && !hasThulyUns) {
+                        thulyUnsRatio = 0;
+                        baUnsRatio    = 1;
+                    }
+                }
+
+                // 5) Tính NB thực tế cho từng KPI
+                if (kpi === 'thuly-sec') {
+                    if (!hasThulySec) return 0;
+                    return thulyBase * secBlockShare * thulySecRatio;
+                }
+
+                if (kpi === 'ba-sec') {
+                    if (!hasBaSec) return 0;
+                    return thulyBase * secBlockShare * baSecRatio;
+                }
+
+                if (kpi === 'thuly-uns') {
+                    if (!hasThulyUns) return 0;
+                    return thulyBase * unsBlockShare * thulyUnsRatio;
+                }
+
+                if (kpi === 'ba-uns') {
+                    if (!hasBaUns) return 0;
+                    return thulyBase * unsBlockShare * baUnsRatio;
+                }
+            }
+
+            // ===== Nhóm SỐ THU: sothu-sec, sothu-uns (dồn NB nếu chỉ 1 thằng) =====
+            let internalBase = cfg.internal / 100;
+            let internalEffective = internalBase;
+
+            if (kpi === 'sothu-uns') {
+                const secRevenueConfig = currentConfig['sothu-sec'];
+                if (secRevenueConfig && !selectedKPIs.includes('sothu-sec')) {
+                    internalEffective += (secRevenueConfig.internal / 100);
+                }
+            } else if (kpi === 'sothu-sec') {
+                const unsRevenueConfig = currentConfig['sothu-uns'];
+                if (unsRevenueConfig && !selectedKPIs.includes('sothu-uns')) {
+                    internalEffective += (unsRevenueConfig.internal / 100);
+                }
+            }
+
+            return internalEffective; // 0–1
+        }
+
+        // Trọng số chi tiết
+        // Nhóm THỤ LÝ: KPI FINAL = NB thực tế * % hoàn thành (không nhân thêm C1/C2)
+        // Nhóm khác: NB * C1 * C2 như bình thường
+        function getDetailWeight(kpi) {
+            const cfg = currentConfig[kpi];
+            if (!cfg) return 0;
+
+            const internalFraction = getInternalFraction(kpi); // 0–1
+
+            if (
+                kpi === 'thuly-sec' ||
+                kpi === 'ba-sec'    ||
+                kpi === 'thuly-uns' ||
+                kpi === 'ba-uns'
+            ) {
+                return internalFraction;
+            }
+
+            const levelMul = (cfg.level1 / 100) * (cfg.level2 / 100);
+            return internalFraction * levelMul;
+        }
+        
+        function updateKPITable() {
+            const tableBody = document.getElementById('kpiTableBody');
+            tableBody.innerHTML = '';
+            
+            selectedKPIs.forEach(kpi => {
+                const config = currentConfig[kpi];
+                if (!config) return;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${config.name}</td>
+                    <td><input type="number" id="kpi_${kpi}" placeholder="Nhập KPI" step="0.01" min="0"></td>
+                    <td><input type="number" id="actual_${kpi}" placeholder="Nhập thực hiện" step="0.01" min="0"></td>
+                    <td id="percent_${kpi}">0%</td>
+                    <td id="nb_${kpi}">0%</td>
+                    <td id="final_${kpi}" class="result">0%</td>
+                `;
+                
+                tableBody.appendChild(row);
+                
+                const kpiInput = document.getElementById(`kpi_${kpi}`);
+                const actualInput = document.getElementById(`actual_${kpi}`);
+                
+                kpiInput.addEventListener('input', calculateKPI);
+                actualInput.addEventListener('input', calculateKPI);
+            });
+            
+            document.getElementById('totalPercent').textContent = '0%';
+            document.getElementById('totalFinal').textContent = '0%';
+            
+            updateSummary();
+            calculateKPI();
+        }
+        
+        function calculateKPI() {
+            let totalPercent = 0;
+            let totalFinal = 0;
+            let validRows = 0;
+            
+            selectedKPIs.forEach(kpi => {
+                const kpiInput = document.getElementById(`kpi_${kpi}`);
+                const actualInput = document.getElementById(`actual_${kpi}`);
+                const percentCell = document.getElementById(`percent_${kpi}`);
+                const finalCell = document.getElementById(`final_${kpi}`);
+                const nbCell = document.getElementById(`nb_${kpi}`);
+                
+                if (!kpiInput || !actualInput) return;
+                
+                const kpiValue = parseFloat(kpiInput.value) || 0;
+                const actualValue = parseFloat(actualInput.value) || 0;
+                
+                const internalFraction = getInternalFraction(kpi); // NB thực tế 0–1
+                const detailWeight = getDetailWeight(kpi);         // 0–1
+                
+                let percent = 0;
+                if (kpiValue > 0) {
+                    percent = Math.min(actualValue / kpiValue, 1.5); // max 150%
+                }
+                
+                // KPI FINAL (%)
+                const final = percent * detailWeight * 100;
+                
+                if (percentCell) {
+                    percentCell.textContent = (percent * 100).toFixed(2) + '%';
+                }
+                if (nbCell) {
+                    nbCell.textContent = (internalFraction * 100).toFixed(2) + '%';
+                }
+                if (finalCell) {
+                    finalCell.textContent = final.toFixed(2) + '%';
+                }
+                
+                if (kpiValue > 0) {
+                    totalPercent += percent;
+                    totalFinal += final;
+                    validRows++;
+                }
+            });
+            
+            const avgPercent = validRows > 0 ? totalPercent / validRows : 0;
+            document.getElementById('totalPercent').textContent = (avgPercent * 100).toFixed(2) + '%';
+            document.getElementById('totalFinal').textContent = totalFinal.toFixed(2) + '%';
+            
+            updateSummary();
+        }
+        
+        function updateSummary() {
+            const totalFinalText = document.getElementById('totalFinal').textContent || '0';
+            const totalFinal = parseFloat(totalFinalText.replace('%', '')) || 0;
+            const summaryText = document.getElementById('summaryText');
+            const summary = document.getElementById('summary');
+            
+            if (selectedKPIs.length === 0) {
+                summaryText.textContent = 'Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.';
+                summary.className = 'summary';
+            } else if (totalFinal === 0) {
+                summaryText.textContent = 'Vui lòng nhập giá trị KPI Giao và Thực hiện để xem kết quả. Lưu ý nhập chi tiết để ra kết quả chính xác';
+                summary.className = 'summary';
+            } else {
+                let performanceLevel = '';
+                let performanceClass = '';
+                
+                if (totalFinal >= 100) {
+                    performanceLevel = '10H CÓ MẶT CTY';
+                    performanceClass = 'performance-excellent';
+                } else if (totalFinal >= 80) {
+                    performanceLevel = 'HÚ HỒN CHIM ÉN';
+                    performanceClass = 'performance-average';
+                } else {
+                    performanceLevel = 'SẮP COOK RỒI';
+                    performanceClass = 'performance-poor';
+                }
+                
+                summaryText.innerHTML = `
+                    Tổng điểm KPI của bạn là <strong>${totalFinal.toFixed(2)}%</strong>.<br>
+                    Mức độ hoàn thành: <strong>${performanceLevel}</strong>.
+                `;
+                summary.className = `summary ${performanceClass}`;
+            }
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function saveToLocalStorage() {
+            const data = {
+                selectedKPIs: selectedKPIs,
+                kpiValues: {}
+            };
+            
+            selectedKPIs.forEach(kpi => {
+                const kpiValue = document.getElementById(`kpi_${kpi}`)?.value || '';
+                const actualValue = document.getElementById(`actual_${kpi}`)?.value || '';
+                data.kpiValues[kpi] = { kpi: kpiValue, actual: actualValue };
+            });
+            
+            localStorage.setItem('kpiUserData', JSON.stringify(data));
+            showNotification('Dữ liệu cá nhân đã được lưu thành công!', 'success');
+        }
+        
+        function loadUserData() {
+            const savedData = localStorage.getItem('kpiUserData');
+            if (!savedData) {
+                updateKPITable();
+                return;
+            }
+
+            const data = JSON.parse(savedData);
+            selectedKPIs = data.selectedKPIs || [];
+            
+            document.querySelectorAll('.kpi-option input[type="checkbox"]').forEach(checkbox => {
+                const kpiOption = checkbox.closest('.kpi-option');
+                const kpi = kpiOption.getAttribute('data-kpi');
+                const isSelected = selectedKPIs.includes(kpi);
+                checkbox.checked = isSelected;
+                kpiOption.classList.toggle('selected', isSelected);
+            });
+            
+            updateKPITable();
+            
+            if (data.kpiValues) {
+                Object.keys(data.kpiValues).forEach(kpi => {
+                    const kpiInput = document.getElementById(`kpi_${kpi}`);
+                    const actualInput = document.getElementById(`actual_${kpi}`);
+                    if (kpiInput && actualInput) {
+                        kpiInput.value = data.kpiValues[kpi].kpi;
+                        actualInput.value = data.kpiValues[kpi].actual;
+                    }
+                });
+                calculateKPI();
+            }
+        }
+    </script>
+</body>
+</html>
