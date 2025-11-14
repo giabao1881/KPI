@@ -5,7 +5,13 @@
       "name": "Thụ lý SEC",
       "internal": 30,
       "level1": 50,
-      "level2": 100
+      "level2": 72
+    },
+    "ba-sec": {
+      "name": "Bản án SEC",
+      "internal": 30,
+      "level1": 50,
+      "level2": 28
     },
     "thuly-uns": {
       "name": "Thụ lý UNS",
