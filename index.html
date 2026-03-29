@@ -552,19 +552,21 @@
             }
         }
 
-        // ====== HÀM TÍNH NB THỰC TẾ (0–1, chưa nhân C1/C2) ======
+        // ====== HÀM TÍNH NB THỰC TẾ & CHIA TỶ LỆ TRỌNG SỐ (0–1) ======
         function getInternalFraction(kpi) {
             const cfg = currentConfig[kpi];
             if (!cfg) return 0;
 
+            const hasThulySec = selectedKPIs.includes('thuly-sec');
+            const hasBaSec    = selectedKPIs.includes('ba-sec');
+            const hasThulyUns = selectedKPIs.includes('thuly-uns');
+            const hasBaUns    = selectedKPIs.includes('ba-uns');
+
+            const hasSothuSec = selectedKPIs.includes('sothu-sec');
+            const hasSothuUns = selectedKPIs.includes('sothu-uns');
+
             // ===== Nhóm THỤ LÝ: thuly-sec, ba-sec, thuly-uns, ba-uns =====
-            if (
-                kpi === 'thuly-sec' ||
-                kpi === 'ba-sec'    ||
-                kpi === 'thuly-uns' ||
-                kpi === 'ba-uns'
-            ) {
-                // 1) Lấy "tổng Thụ lý" từ config (ưu tiên thuly-uns → thuly-sec → ba-uns → ba-sec)
+            if (['thuly-sec', 'ba-sec', 'thuly-uns', 'ba-uns'].includes(kpi)) {
                 let totalInternalPercent = 0;
                 if (currentConfig['thuly-uns'] && currentConfig['thuly-uns'].internal) {
                     totalInternalPercent = currentConfig['thuly-uns'].internal;
@@ -576,19 +578,13 @@
                     totalInternalPercent = currentConfig['ba-sec'].internal;
                 }
 
-                const thulyBase = totalInternalPercent / 100; // ví dụ 30% → 0.3
-
-                const hasThulySec = selectedKPIs.includes('thuly-sec');
-                const hasBaSec    = selectedKPIs.includes('ba-sec');
-                const hasThulyUns = selectedKPIs.includes('thuly-uns');
-                const hasBaUns    = selectedKPIs.includes('ba-uns');
+                const thulyBase = totalInternalPercent / 100;
 
                 const hasSecSide = hasThulySec || hasBaSec;
                 const hasUnsSide = hasThulyUns || hasBaUns;
 
                 if (!hasSecSide && !hasUnsSide) return 0;
 
-                // 2) Chia rổ Thụ lý giữa "nhánh SEC" và "nhánh UNS" theo level1 (thuly-sec vs thuly-uns)
                 const secCfg = currentConfig['thuly-sec'] || {};
                 const unsCfg = currentConfig['thuly-uns'] || {};
 
@@ -596,8 +592,8 @@
                 const unsL1 = hasUnsSide ? (unsCfg.level1 || 0) : 0;
                 const sumL1 = secL1 + unsL1;
 
-                let secBlockShare = 0; // phần rổ Thụ lý cho nhánh SEC (thuly-sec + ba-sec)
-                let unsBlockShare = 0; // phần rổ Thụ lý cho nhánh UNS (thuly-uns + ba-uns)
+                let secBlockShare = 0;
+                let unsBlockShare = 0;
 
                 if (hasSecSide && hasUnsSide) {
                     if (sumL1 > 0) {
@@ -615,7 +611,6 @@
                     unsBlockShare = 1;
                 }
 
-                // 3) Trong nhánh SEC: chia thuly-sec vs ba-sec theo level2
                 const baSecCfg = currentConfig['ba-sec'] || {};
                 const secSplitBase   = hasThulySec ? (secCfg.level2   || 0) : 0;
                 const baSecSplitBase = hasBaSec    ? (baSecCfg.level2 || 0) : 0;
@@ -638,7 +633,6 @@
                     }
                 }
 
-                // 4) Trong nhánh UNS: chia thuly-uns vs ba-uns theo level2
                 const baUnsCfg = currentConfig['ba-uns'] || {};
                 const unsSplitBase   = hasThulyUns ? (unsCfg.level2   || 0) : 0;
                 const baUnsSplitBase = hasBaUns    ? (baUnsCfg.level2 || 0) : 0;
@@ -661,67 +655,85 @@
                     }
                 }
 
-                // 5) Tính NB thực tế cho từng KPI
-                if (kpi === 'thuly-sec') {
-                    if (!hasThulySec) return 0;
-                    return thulyBase * secBlockShare * thulySecRatio;
+                if (kpi === 'thuly-sec') return thulyBase * secBlockShare * thulySecRatio;
+                if (kpi === 'ba-sec')    return thulyBase * secBlockShare * baSecRatio;
+                if (kpi === 'thuly-uns') return thulyBase * unsBlockShare * thulyUnsRatio;
+                if (kpi === 'ba-uns')    return thulyBase * unsBlockShare * baUnsRatio;
+            }
+
+            // ===== Nhóm SỐ THU (Logic mới chuẩn hóa) =====
+            if (['sothu-sec', 'sothu-uns'].includes(kpi)) {
+                let totalInternalPercent = 0;
+                if (currentConfig['sothu-uns'] && currentConfig['sothu-uns'].internal) {
+                    totalInternalPercent = currentConfig['sothu-uns'].internal;
+                } else if (currentConfig['sothu-sec'] && currentConfig['sothu-sec'].internal) {
+                    totalInternalPercent = currentConfig['sothu-sec'].internal;
+                } else {
+                    totalInternalPercent = cfg.internal;
                 }
 
-                if (kpi === 'ba-sec') {
-                    if (!hasBaSec) return 0;
-                    return thulyBase * secBlockShare * baSecRatio;
+                const base = totalInternalPercent / 100;
+
+                if (!hasSothuSec && !hasSothuUns) return 0;
+
+                const secCfg = currentConfig['sothu-sec'] || {};
+                const unsCfg = currentConfig['sothu-uns'] || {};
+
+                const secL1 = hasSothuSec ? (secCfg.level1 || 0) : 0;
+                const unsL1 = hasSothuUns ? (unsCfg.level1 || 0) : 0;
+                const sumL1 = secL1 + unsL1;
+
+                let secRatio = 0;
+                let unsRatio = 0;
+
+                // Quy tắc gánh team của nhóm Số thu
+                if (hasSothuSec && hasSothuUns) {
+                    if (sumL1 > 0) {
+                        secRatio = secL1 / sumL1;
+                        unsRatio = unsL1 / sumL1;
+                    } else {
+                        secRatio = 0.5;
+                        unsRatio = 0.5;
+                    }
+                } else if (hasSothuSec && !hasSothuUns) {
+                    secRatio = 1;
+                    unsRatio = 0;
+                } else if (!hasSothuSec && hasSothuUns) {
+                    secRatio = 0;
+                    unsRatio = 1;
                 }
 
-                if (kpi === 'thuly-uns') {
-                    if (!hasThulyUns) return 0;
-                    return thulyBase * unsBlockShare * thulyUnsRatio;
+                if (kpi === 'sothu-sec') {
+                    if (!hasSothuSec) return 0;
+                    const l2 = (cfg.level2 !== undefined ? cfg.level2 : 100) / 100;
+                    return base * secRatio * l2;
                 }
 
-                if (kpi === 'ba-uns') {
-                    if (!hasBaUns) return 0;
-                    return thulyBase * unsBlockShare * baUnsRatio;
+                if (kpi === 'sothu-uns') {
+                    if (!hasSothuUns) return 0;
+                    const l2 = (cfg.level2 !== undefined ? cfg.level2 : 100) / 100;
+                    return base * unsRatio * l2;
                 }
             }
 
-            // ===== Nhóm SỐ THU: sothu-sec, sothu-uns (dồn NB nếu chỉ 1 thằng) =====
-            let internalBase = cfg.internal / 100;
-            let internalEffective = internalBase;
-
-            if (kpi === 'sothu-uns') {
-                const secRevenueConfig = currentConfig['sothu-sec'];
-                if (secRevenueConfig && !selectedKPIs.includes('sothu-sec')) {
-                    internalEffective += (secRevenueConfig.internal / 100);
-                }
-            } else if (kpi === 'sothu-sec') {
-                const unsRevenueConfig = currentConfig['sothu-uns'];
-                if (unsRevenueConfig && !selectedKPIs.includes('sothu-uns')) {
-                    internalEffective += (unsRevenueConfig.internal / 100);
-                }
-            }
-
-            return internalEffective; // 0–1
+            // Fallback an toàn cho các KPI khác
+            return (cfg.internal / 100);
         }
 
-        // Trọng số chi tiết
-        // Nhóm THỤ LÝ: KPI FINAL = NB thực tế * % hoàn thành (không nhân thêm C1/C2)
-        // Nhóm khác: NB * C1 * C2 như bình thường
+        // ====== Hàm tính Trọng số chi tiết cuối cùng ======
         function getDetailWeight(kpi) {
-            const cfg = currentConfig[kpi];
-            if (!cfg) return 0;
-
-            const internalFraction = getInternalFraction(kpi); // 0–1
-
-            if (
-                kpi === 'thuly-sec' ||
-                kpi === 'ba-sec'    ||
-                kpi === 'thuly-uns' ||
-                kpi === 'ba-uns'
-            ) {
-                return internalFraction;
+            // Nhờ logic gom nhóm ở trên, getInternalFraction hiện đã tính chính xác tỷ trọng chia chéo
+            // cho 6 chỉ tiêu lõi này (đã cân đối C1, C2 và bù trừ cho nhau).
+            if (['thuly-sec', 'ba-sec', 'thuly-uns', 'ba-uns', 'sothu-sec', 'sothu-uns'].includes(kpi)) {
+                return getInternalFraction(kpi);
             }
 
-            const levelMul = (cfg.level1 / 100) * (cfg.level2 / 100);
-            return internalFraction * levelMul;
+            // Fallback bình thường cho các KPI thêm mới (nếu có)
+            const cfg = currentConfig[kpi];
+            if (!cfg) return 0;
+            const internalBase = getInternalFraction(kpi);
+            const levelMul = ((cfg.level1 !== undefined ? cfg.level1 : 100) / 100) * ((cfg.level2 !== undefined ? cfg.level2 : 100) / 100);
+            return internalBase * levelMul;
         }
         
         function updateKPITable() {
@@ -775,7 +787,7 @@
                 const kpiValue = parseFloat(kpiInput.value) || 0;
                 const actualValue = parseFloat(actualInput.value) || 0;
                 
-                const internalFraction = getInternalFraction(kpi); // NB thực tế 0–1
+                const internalFraction = getInternalFraction(kpi); // Hiển thị NB thực tế 0–1
                 const detailWeight = getDetailWeight(kpi);         // 0–1
                 
                 let percent = 0;
