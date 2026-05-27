@@ -1,922 +1,609 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Tính KPI</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --light: #ecf0f1;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-        
-        header {
-            background: var(--primary);
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .logo i {
-            font-size: 36px;
-            color: var(--secondary);
-        }
-        
-        .logo h1 {
-            font-size: 28px;
-            color: white;
-        }
-        
-        .config-info {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        
-        .config-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .config-item {
-            background: rgba(255,255,255,0.2);
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        
-        .main-content {
-            padding: 30px;
-        }
-        
-        .section-title {
-            color: var(--primary);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--secondary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .month-info {
-            background: var(--light);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 18px;
-            color: var(--primary);
-        }
-        
-        .kpi-selection {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-        
-        .kpi-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px;
-            background: var(--light);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .kpi-option:hover {
-            background: #dfe6e9;
-        }
-        
-        .kpi-option.selected {
-            background: var(--secondary);
-            color: white;
-        }
-        
-        .kpi-option input {
-            width: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px 10px;
-            text-align: center;
-        }
-        
-        th {
-            background-color: var(--primary);
-            color: white;
-            font-weight: 600;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        
-        input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        
-        input:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-            outline: none;
-        }
-        
-        .result {
-            font-weight: bold;
-            background-color: #e8f4fd;
-        }
-        
-        .total-row {
-            font-weight: bold;
-            background-color: var(--light);
-        }
-        
-        .summary {
-            margin-top: 20px;
-            padding: 20px;
-            background: #e8f4fd;
-            border-radius: 8px;
-            border-left: 4px solid var(--secondary);
-        }
-        
-        .summary h3 {
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-        
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            flex: 1;
-            justify-content: center;
-        }
-        
-        .btn-primary {
-            background-color: var(--secondary);
-            color: white;
-        }
-        
-        .btn-success {
-            background-color: var(--success);
-            color: white;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 15px;
-            color: #666;
-            font-size: 14px;
-            background: var(--light);
-            border-top: 1px solid #ddd;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transform: translateX(150%);
-            transition: transform 0.5s ease;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.success {
-            background-color: var(--success);
-        }
-        
-        .notification.info {
-            background-color: var(--secondary);
-        }
-        
-        .performance-excellent { background-color: #d4edda; color: #155724; }
-        .performance-good { background-color: #d1ecf1; color: #0c5460; }
-        .performance-average { background-color: #fff3cd; color: #856404; }
-        .performance-poor { background-color: #f8d7da; color: #721c24; }
-        
-        .last-update {
-            font-size: 12px;
-            color: #ffffff;
-            margin-top: 5px;
-            text-align: center;
-            font-weight: bold;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-        
-        @media (max-width: 768px) {
-            .kpi-selection {
-                grid-template-columns: 1fr;
-            }
-            
-            .config-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hệ Thống Tính KPI</title>
+  <style>
+    :root {
+      --bg:#f4f7ff; --card:#ffffff; --text:#12213f; --muted:#6b7897;
+      --primary:#2563eb; --primary2:#7c3aed; --success:#16a34a; --danger:#dc2626; --line:#e2e8f0;
+      --shadow:0 18px 45px rgba(31,41,55,.12);
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:linear-gradient(180deg,#eef4ff 0,#f8fbff 42%,#eef2ff 100%);}
+    .top{background:linear-gradient(135deg,#1d4ed8,#6d28d9);color:#fff;padding:34px 18px 90px;text-align:center;position:relative;overflow:hidden}
+    .top:before,.top:after{content:"";position:absolute;border-radius:999px;background:rgba(255,255,255,.12);filter:blur(2px)}
+    .top:before{width:260px;height:260px;left:-80px;top:-70px} .top:after{width:360px;height:360px;right:-130px;bottom:-170px}
+    .brand{position:relative;z-index:1;max-width:980px;margin:auto} h1{margin:8px 0 10px;font-size:clamp(28px,5vw,52px);letter-spacing:.02em;font-weight:900;text-transform:uppercase}
+    .subtitle{margin:0;color:rgba(255,255,255,.88);font-size:18px} .auto{display:inline-flex;gap:8px;align-items:center;margin-top:18px;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);font-weight:700}
+    .wrap{max-width:1180px;margin:-60px auto 28px;padding:0 16px;position:relative;z-index:2} .panel{background:var(--card);border:1px solid rgba(226,232,240,.9);border-radius:26px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+    .panel-head{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .panel-title{display:flex;align-items:center;gap:11px;font-size:23px;font-weight:900;color:#1e3a8a} .badge{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:14px;background:#eff6ff;color:#1d4ed8}
+    select,input{font:inherit;border:1px solid #cbd5e1;border-radius:14px;padding:12px 13px;background:#fff;outline:none} input:focus,select:focus{border-color:#3b82f6;box-shadow:0 0 0 4px rgba(59,130,246,.12)}
+    .weights{padding:20px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px} .wcard{border:1px solid var(--line);border-radius:20px;padding:16px;background:linear-gradient(180deg,#fff,#f8fbff)}
+    .wcard span{display:block;color:var(--muted);font-size:13px} .wcard strong{display:block;margin-top:6px;font-size:28px;color:#1d4ed8}
+    .form-grid{padding:22px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px} .kpi-card{border:1px solid var(--line);border-radius:22px;padding:17px;background:#fff;box-shadow:0 8px 20px rgba(15,23,42,.04)}
+    .kpi-card label{display:flex;justify-content:space-between;align-items:center;gap:12px;font-weight:850;margin-bottom:12px} .kpi-card input[type=checkbox]{width:20px;height:20px;min-width:auto;accent-color:#2563eb}
+    .field{display:grid;grid-template-columns:1fr 1fr;gap:10px} .field small{display:block;color:var(--muted);font-weight:700;margin-bottom:5px} .field input{width:100%;min-width:0}
+    .mini-result{margin-top:12px;display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border-radius:14px;padding:10px 12px;color:#475569;font-weight:800} .mini-result b{color:#1d4ed8}
+    .table-box{padding:0 24px 24px;overflow:auto} table{width:100%;border-collapse:separate;border-spacing:0;min-width:900px;border:1px solid var(--line);border-radius:18px;overflow:hidden} th,td{padding:14px 12px;border-bottom:1px solid var(--line);text-align:left} th{background:#eff6ff;color:#1e3a8a;font-size:13px;text-transform:uppercase;letter-spacing:.03em} tr:last-child td{border-bottom:0} td.num,th.num{text-align:right}
+    .pill{display:inline-flex;min-width:82px;justify-content:center;border-radius:999px;padding:7px 10px;font-weight:900;background:#fef3c7;color:#92400e} .pill.ok{background:#dcfce7;color:#166534} .pill.bad{background:#fee2e2;color:#991b1b}
+    .total-row td{background:#f8fafc;font-weight:950;color:#0f172a} .summary{padding:22px 24px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:stretch}
+    .result-card{border-radius:24px;background:linear-gradient(135deg,#0f172a,#1d4ed8);color:#fff;padding:22px;display:flex;align-items:center;justify-content:space-between;gap:20px} .result-card span{opacity:.78} .result-card strong{display:block;font-size:48px;margin-top:4px}
+    .notice{border:1px dashed #c7d2fe;background:#eef2ff;border-radius:22px;padding:18px;color:#334155;line-height:1.55} .notice b{color:#1d4ed8}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;padding:0 24px 24px} button,.file-btn{border:0;border-radius:15px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;padding:13px 18px;font-weight:900;cursor:pointer;box-shadow:0 10px 22px rgba(37,99,235,.22)} button.secondary,.file-btn.secondary{background:#fff;color:#1d4ed8;border:1px solid #bfdbfe;box-shadow:none}
+    footer{text-align:center;color:#64748b;padding:20px 16px 35px} .toast{position:fixed;right:18px;bottom:18px;background:#0f172a;color:#fff;padding:14px 18px;border-radius:16px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);transition:.25s;z-index:10} .toast.show{opacity:1;transform:translateY(0)}
+    @media(max-width:900px){.weights,.form-grid,.summary{grid-template-columns:1fr} .result-card{display:block} .panel-head{align-items:flex-start}}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <i class="fas fa-chart-line"></i>
-                <h1>HỆ THỐNG TÍNH KPI</h1>
-            </div>
-            <p>Công cụ tính KPI - Tự động cập nhật</p>
-            
-            <div class="config-info">
-                <div><i class="fas fa-info-circle"></i> Trọng số KPI hiện tại (Tự động cập nhật)</div>
-                <div class="config-grid" id="currentConfig"></div>
-                <div class="last-update" id="lastUpdate"></div>
-            </div>
-        </header>
-        
-        <div class="main-content">
-            <h2 class="section-title">
-                <i class="fas fa-calculator"></i> TÍNH KPI CÁ NHÂN
-            </h2>
-            
-            <div class="month-info" id="monthInfo"></div>
-            
-            <div class="kpi-selection">
-                <div class="kpi-option" data-kpi="thuly-sec">
-                    <input type="checkbox" id="kpiThulySec">
-                    <label for="kpiThulySec">Thụ lý SEC</label>
-                </div>
-                <div class="kpi-option" data-kpi="ba-sec">
-                    <input type="checkbox" id="kpiBaSec">
-                    <label for="kpiBaSec">Bản án SEC</label>
-                </div>
-                <div class="kpi-option" data-kpi="thuly-uns">
-                    <input type="checkbox" id="kpiThulyUns">
-                    <label for="kpiThulyUns">Thụ lý UNS</label>
-                </div>
-                <div class="kpi-option" data-kpi="ba-uns">
-                    <input type="checkbox" id="kpiBaUns">
-                    <label for="kpiBaUns">Bản án UNS</label>
-                </div>
-                <div class="kpi-option" data-kpi="sothu-sec">
-                    <input type="checkbox" id="kpiSothuSec">
-                    <label for="kpiSothuSec">Số thu SEC</label>
-                </div>
-                <div class="kpi-option" data-kpi="sothu-uns">
-                    <input type="checkbox" id="kpiSothuUns">
-                    <label for="kpiSothuUns">Số thu UNS</label>
-                </div>
-            </div>
-            
-            <table id="kpiTable">
-                <thead>
-                    <tr>
-                        <th>Chỉ tiêu</th>
-                        <th>KPI Giao</th>
-                        <th>Thực hiện</th>
-                        <th>% Hoàn thành</th>
-                        <th>NB thực tế</th>
-                        <th>KPI FINAL</th>
-                    </tr>
-                </thead>
-                <tbody id="kpiTableBody"></tbody>
-                <tfoot>
-                    <tr class="total-row">
-                        <td style="text-align: right; font-weight: bold;">TỔNG CỘNG</td>
-                        <td></td>
-                        <td></td>
-                        <td id="totalPercent">0%</td>
-                        <td></td>
-                        <td id="totalFinal" class="result">0%</td>
-                    </tr>
-                </tfoot>
-            </table>
-            
-            <div class="summary" id="summary">
-                <h3><i class="fas fa-chart-pie"></i> TỔNG KẾT KPI</h3>
-                <p id="summaryText">
-                    Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.<br>
-                    <strong>Lưu ý:</strong> Nhập số chi tiết để ra kết quả chính xác nhất
-                </p>
-            </div>
-            
-            <div class="controls">
-                <button class="btn btn-primary" id="saveData">
-                    <i class="fas fa-save"></i> Lưu Dữ Liệu Cá Nhân
-                </button>
-                <button class="btn btn-success" id="checkUpdate">
-                    <i class="fas fa-sync"></i> Kiểm Tra Cập Nhật
-                </button>
-            </div>
-        </div>
-        
-        <footer>
-            <p>Hệ thống tính KPI &copy; 2025 - Baotg10</p>
-        </footer>
+  <header class="top">
+    <div class="brand">
+      <h1>HỆ THỐNG TÍNH KPI</h1>
+      <p class="subtitle">Công cụ tính KPI - Tự động cập nhật</p>
+      <div class="auto">⚡ Trọng số KPI hiện tại <span id="autoWeight">0%</span></div>
     </div>
-    
-    <div class="notification" id="notification">
-        <i class="fas fa-check-circle"></i>
-        <span id="notificationText">Thao tác thành công!</span>
-    </div>
+  </header>
 
-    <script>
-        // Link JSON config trên GitHub
-        const CONFIG_URL = 'https://giabao1881.github.io/KPI/kpi-config.json';
-        
-        let currentConfig = {};
-        let selectedKPIs = [];
-        let currentMonth = '';
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            loadConfigFromGitHub();
-            
-            document.getElementById('saveData').addEventListener('click', saveToLocalStorage);
-            document.getElementById('checkUpdate').addEventListener('click', loadConfigFromGitHub);
-            
-            document.querySelectorAll('.kpi-option input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const kpiOption = this.closest('.kpi-option');
-                    const kpiKey = kpiOption.getAttribute('data-kpi');
-                    
-                    if (this.checked) {
-                        kpiOption.classList.add('selected');
-                        if (!selectedKPIs.includes(kpiKey)) {
-                            selectedKPIs.push(kpiKey);
-                        }
-                    } else {
-                        kpiOption.classList.remove('selected');
-                        const index = selectedKPIs.indexOf(kpiKey);
-                        if (index > -1) {
-                            selectedKPIs.splice(index, 1);
-                        }
-                    }
-                    updateKPITable();
-                });
-            });
-            
-            // Tự cập nhật config mỗi 5 phút
-            setInterval(loadConfigFromGitHub, 5 * 60 * 1000);
-        });
-        
-        // ========== LOAD CONFIG ==========
-        async function loadConfigFromGitHub() {
-            try {
-                showNotification('Đang tải cấu hình mới nhất từ GitHub...', 'info');
-                
-                const response = await fetch(CONFIG_URL + '?t=' + new Date().getTime());
-                if (!response.ok) throw new Error('Không thể tải cấu hình từ GitHub');
-                
-                const configData = await response.json();
-                currentConfig = configData.config || {};
-                currentMonth = configData.month || '';
-                
-                localStorage.setItem('kpiConfig', JSON.stringify(configData));
-                localStorage.setItem('kpiConfigLastUpdate', new Date().toLocaleString('vi-VN'));
-                
-                updateConfigDisplay();
-                loadUserData();
-                showNotification('Đã cập nhật cấu hình mới nhất!', 'success');
-            } catch (error) {
-                console.error('Lỗi khi tải cấu hình:', error);
-                loadConfigFromLocalStorage();
-                loadUserData();
-                showNotification('Đang sử dụng cấu hình cũ (lỗi kết nối GitHub)', 'info');
-            }
-        }
-        
-        function loadConfigFromLocalStorage() {
-            const savedConfig = localStorage.getItem('kpiConfig');
-            const lastUpdate = localStorage.getItem('kpiConfigLastUpdate');
-            
-            if (savedConfig) {
-                const configData = JSON.parse(savedConfig);
-                currentConfig = configData.config || {};
-                currentMonth = configData.month || '';
-                updateConfigDisplay(lastUpdate);
-            } else {
-                currentConfig = getDefaultConfig();
-                currentMonth = 'Tháng 11';
-                updateConfigDisplay();
-            }
-        }
-        
-        // Fallback khi không có JSON online / offline
-        function getDefaultConfig() {
-            return {
-                "thuly-sec": { 
-                    name: "Thụ lý SEC",
-                    internal: 30, 
-                    level1: 50, 
-                    level2: 80 
-                },
-                "ba-sec": {
-                    name: "Bản án SEC",
-                    internal: 30,
-                    level1: 50,
-                    level2: 20
-                },
-                "thuly-uns": { 
-                    name: "Thụ lý UNS",
-                    internal: 30, 
-                    level1: 50, 
-                    level2: 80 
-                },
-                "ba-uns": { 
-                    name: "Bản án UNS",
-                    internal: 30,
-                    level1: 50,
-                    level2: 20 
-                },
-                "sothu-sec": { 
-                    name: "Số thu SEC",
-                    internal: 70, 
-                    level1: 60, 
-                    level2: 100 
-                },
-                "sothu-uns": { 
-                    name: "Số thu UNS",
-                    internal: 70, 
-                    level1: 40, 
-                    level2: 100 
-                }
-            };
-        }
-        
-        function updateConfigDisplay(lastUpdate = null) {
-            const monthInfo = document.getElementById('monthInfo');
-            const configContainer = document.getElementById('currentConfig');
-            const lastUpdateElement = document.getElementById('lastUpdate');
-            
-            monthInfo.innerHTML = `<i class="fas fa-calendar-alt"></i> ${currentMonth || 'Chưa cấu hình tháng'}`;
-            configContainer.innerHTML = '';
-            
-            Object.keys(currentConfig).forEach(kpi => {
-                const config = currentConfig[kpi];
-                const configItem = document.createElement('div');
-                configItem.className = 'config-item';
-                
-                configItem.innerHTML = `
-                    <div style="font-weight: bold; margin-bottom: 5px;">${config.name}</div>
-                    <div style="font-size: 12px;">
-                        NB: ${config.internal}% | C1: ${config.level1}% | C2: ${config.level2}%
-                    </div>
-                `;
-                
-                configContainer.appendChild(configItem);
-            });
-            
-            if (lastUpdate) {
-                lastUpdateElement.textContent = `Cập nhật lần cuối: ${lastUpdate}`;
-            } else {
-                lastUpdateElement.textContent = `Cập nhật lần cuối: ${new Date().toLocaleString('vi-VN')}`;
-            }
-        }
+  <main class="wrap">
+    <section class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="badge">📊</span> TÍNH KPI CÁ NHÂN</div>
+        <select id="templateSelect" title="Chọn mẫu KPI"></select>
+      </div>
+      <div class="weights">
+        <div class="wcard"><span>Tổng trọng số đang chọn</span><strong id="totalWeightTop">0%</strong></div>
+        <div class="wcard"><span>Số chỉ tiêu KPI</span><strong id="countTop">0</strong></div>
+        <div class="wcard"><span>KPI Final tạm tính</span><strong id="finalTop">0%</strong></div>
+      </div>
+      <div class="form-grid" id="kpiCards"></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Chỉ tiêu KPI</th><th class="num">Giao</th><th class="num">Thực hiện</th><th class="num">% Hoàn thành</th><th class="num">NB thực tế</th><th class="num">KPI FINAL</th></tr></thead>
+          <tbody id="detailRows"></tbody>
+        </table>
+      </div>
+      <div class="summary">
+        <div class="notice" id="notice">💡 <b>Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.</b><br>Lưu ý: Nhập số chi tiết để ra kết quả chính xác nhất.</div>
+        <div class="result-card"><div><span>TỔNG KẾT KPI</span><strong id="grandFinal">0%</strong><small id="ratingText">Chưa có dữ liệu</small></div><div style="font-size:42px">🏆</div></div>
+      </div>
+      <div class="actions">
+        <button id="saveBtn">💾 Lưu Dữ Liệu Cá Nhân</button>
+        <button id="checkBtn" class="secondary">🔄 Kiểm Tra Cập Nhật</button>
+        <button id="resetBtn" class="secondary">↺ Làm mới</button>
+      </div>
+    </section>
+  </main>
+  <footer>Hệ thống tính KPI © 2025 - Baotg10</footer>
+  <div id="toast" class="toast">Thao tác thành công!</div>
 
-        // ====== HÀM TÍNH NB THỰC TẾ & CHIA TỶ LỆ TRỌNG SỐ (0–1) ======
-        function getInternalFraction(kpi) {
-            const cfg = currentConfig[kpi];
-            if (!cfg) return 0;
+<script>
+const KPI_TEMPLATES = [
+  {
+    "name": "Sheet2 - Bảng 1",
+    "kpis": [
+      {
+        "stt": 1,
+        "chiTieu": "Tố tụng – Thụ lý",
+        "phanKhuc": "SEC",
+        "tyTrong1": 0.3,
+        "tyTrong2": 0.5,
+        "tyTrong3": null,
+        "kpiGiao": 1,
+        "thucHien": 2
+      },
+      {
+        "stt": 2,
+        "chiTieu": "Tố tụng – Thụ lý",
+        "phanKhuc": "UNS",
+        "tyTrong1": 0.3,
+        "tyTrong2": 0.8,
+        "tyTrong3": null,
+        "kpiGiao": 21,
+        "thucHien": 21
+      },
+      {
+        "stt": 3,
+        "chiTieu": "Tố tụng – Bản án",
+        "phanKhuc": "UNS",
+        "tyTrong1": 0.3,
+        "tyTrong2": 0.2,
+        "tyTrong3": null,
+        "kpiGiao": 1,
+        "thucHien": 2
+      },
+      {
+        "stt": 4,
+        "chiTieu": "Số thu ",
+        "phanKhuc": "SEC",
+        "tyTrong1": 0.7,
+        "tyTrong2": 0.6,
+        "tyTrong3": null,
+        "kpiGiao": 5.5,
+        "thucHien": 12
+      },
+      {
+        "stt": 5,
+        "chiTieu": "Số thu",
+        "phanKhuc": "UNS",
+        "tyTrong1": 0.7,
+        "tyTrong2": 0.4,
+        "tyTrong3": null,
+        "kpiGiao": 0.6,
+        "thucHien": 0.3
+      }
+    ]
+  },
+  {
+    "name": "Sheet2 - Bảng 2",
+    "kpis": [
+      {
+        "stt": 1,
+        "chiTieu": "Tố tụng – Thụ lý",
+        "phanKhuc": "UNS",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.43,
+        "tyTrong3": null,
+        "kpiGiao": 5,
+        "thucHien": 15.8
+      },
+      {
+        "stt": 2,
+        "chiTieu": "Tố tụng – BẢN án",
+        "phanKhuc": "UNS",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.57,
+        "tyTrong3": null,
+        "kpiGiao": 3,
+        "thucHien": 5
+      },
+      {
+        "stt": 4,
+        "chiTieu": "Số thu ",
+        "phanKhuc": "UNS",
+        "tyTrong1": 0.5,
+        "tyTrong2": 1,
+        "tyTrong3": null,
+        "kpiGiao": 0.892275835695581,
+        "thucHien": 0.09
+      }
+    ]
+  },
+  {
+    "name": "Sheet2 - Bảng 3",
+    "kpis": [
+      {
+        "stt": 1,
+        "chiTieu": "Thu_ly_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": null,
+        "kpiGiao": 5,
+        "thucHien": 15.8
+      },
+      {
+        "stt": 2,
+        "chiTieu": "Tham_dinh_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": null,
+        "kpiGiao": 3,
+        "thucHien": 5
+      },
+      {
+        "stt": 3,
+        "chiTieu": "Ban_an_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": null,
+        "kpiGiao": 0.892275835695581,
+        "thucHien": 0.09
+      },
+      {
+        "stt": 4,
+        "chiTieu": "QD_THA_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": null,
+        "kpiGiao": 0,
+        "thucHien": 0
+      },
+      {
+        "stt": 5,
+        "chiTieu": "Ke_bien_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": null,
+        "kpiGiao": 0,
+        "thucHien": 0
+      },
+      {
+        "stt": 6,
+        "chiTieu": "Thu_ly_UNS",
+        "phanKhuc": "TT _UNS",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": null,
+        "kpiGiao": 0,
+        "thucHien": 0
+      },
+      {
+        "stt": 7,
+        "chiTieu": "Ban_an_UNS",
+        "phanKhuc": "TT _UNS",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": null,
+        "kpiGiao": 0,
+        "thucHien": 0
+      },
+      {
+        "stt": 8,
+        "chiTieu": "QD_THA_UNS",
+        "phanKhuc": "TT _UNS",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": null,
+        "kpiGiao": 0,
+        "thucHien": 0
+      },
+      {
+        "stt": 9,
+        "chiTieu": "BB_SEC_non_WO",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.9,
+        "tyTrong2": 0,
+        "tyTrong3": null,
+        "kpiGiao": 0,
+        "thucHien": 0
+      },
+      {
+        "stt": 10,
+        "chiTieu": "Thu_Giu",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.9,
+        "tyTrong2": 0,
+        "tyTrong3": null,
+        "kpiGiao": 0,
+        "thucHien": 0
+      },
+      {
+        "stt": 11,
+        "chiTieu": "BB_SEC_WO",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.9,
+        "tyTrong2": 0,
+        "tyTrong3": null,
+        "kpiGiao": 0,
+        "thucHien": 0
+      },
+      {
+        "stt": 12,
+        "chiTieu": "GB_All",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.9,
+        "tyTrong2": 0,
+        "tyTrong3": null,
+        "kpiGiao": 0,
+        "thucHien": 0
+      }
+    ]
+  },
+  {
+    "name": "Sheet4",
+    "kpis": [
+      {
+        "stt": 1,
+        "chiTieu": "Thu_ly_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.2,
+        "kpiGiao": 328.961815262,
+        "thucHien": 0
+      },
+      {
+        "stt": 2,
+        "chiTieu": "Tham_dinh_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.2,
+        "kpiGiao": 250.525716967,
+        "thucHien": 0
+      },
+      {
+        "stt": 3,
+        "chiTieu": "Ban_an_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.2,
+        "kpiGiao": 42.04,
+        "thucHien": 0
+      },
+      {
+        "stt": 4,
+        "chiTieu": "QD_THA_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.2,
+        "kpiGiao": 72.346666778835,
+        "thucHien": 0
+      },
+      {
+        "stt": 5,
+        "chiTieu": "Ke_bien_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.2,
+        "kpiGiao": 26.19662308595,
+        "thucHien": 0
+      },
+      {
+        "stt": 6,
+        "chiTieu": "Thu_ly_UNS",
+        "phanKhuc": "TT _UNS",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.333333333333333,
+        "kpiGiao": 453,
+        "thucHien": 0
+      },
+      {
+        "stt": 7,
+        "chiTieu": "Ban_an_UNS",
+        "phanKhuc": "TT _UNS",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.333333333333333,
+        "kpiGiao": 79,
+        "thucHien": 0
+      },
+      {
+        "stt": 8,
+        "chiTieu": "QD_THA_UNS",
+        "phanKhuc": "TT _UNS",
+        "tyTrong1": 0.1,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.333333333333333,
+        "kpiGiao": 41.80855939376,
+        "thucHien": 0
+      },
+      {
+        "stt": 9,
+        "chiTieu": "BB_SEC_non_WO",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.9,
+        "tyTrong2": 0.671434215593393,
+        "tyTrong3": null,
+        "kpiGiao": 102.88449748398,
+        "thucHien": 0
+      },
+      {
+        "stt": 10,
+        "chiTieu": "Thu_Giu",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.9,
+        "tyTrong2": 0.15,
+        "tyTrong3": null,
+        "kpiGiao": 121.599148192047,
+        "thucHien": 0
+      },
+      {
+        "stt": 11,
+        "chiTieu": "BB_SEC_WO",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.9,
+        "tyTrong2": 0.0505324861005478,
+        "tyTrong3": null,
+        "kpiGiao": 2.09428085925554,
+        "thucHien": 0
+      },
+      {
+        "stt": 12,
+        "chiTieu": "GB_All",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.9,
+        "tyTrong2": 0.128033298306059,
+        "tyTrong3": null,
+        "kpiGiao": 20.1474021395192,
+        "thucHien": 0
+      }
+    ]
+  },
+  {
+    "name": "Sheet4 (2)",
+    "kpis": [
+      {
+        "stt": 1,
+        "chiTieu": "Thu_ly_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.2,
+        "kpiGiao": 65.771949524,
+        "thucHien": 0
+      },
+      {
+        "stt": 2,
+        "chiTieu": "Tham_dinh_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.2,
+        "kpiGiao": 24.944518747,
+        "thucHien": 0
+      },
+      {
+        "stt": 3,
+        "chiTieu": "Ban_an_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.2,
+        "kpiGiao": 1.744788754,
+        "thucHien": 0
+      },
+      {
+        "stt": 4,
+        "chiTieu": "QD_THA_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.2,
+        "kpiGiao": 12.557350123465001,
+        "thucHien": 0
+      },
+      {
+        "stt": 5,
+        "chiTieu": "Ke_bien_SEC",
+        "phanKhuc": "TT _SEC",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.2,
+        "kpiGiao": 2.4203320928000003,
+        "thucHien": 0
+      },
+      {
+        "stt": 6,
+        "chiTieu": "Thu_ly_UNS",
+        "phanKhuc": "TT _UNS",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.333333333333333,
+        "kpiGiao": 20,
+        "thucHien": 0
+      },
+      {
+        "stt": 7,
+        "chiTieu": "Ban_an_UNS",
+        "phanKhuc": "TT _UNS",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.333333333333333,
+        "kpiGiao": 8,
+        "thucHien": 0
+      },
+      {
+        "stt": 8,
+        "chiTieu": "QD_THA_UNS",
+        "phanKhuc": "TT _UNS",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.5,
+        "tyTrong3": 0.333333333333333,
+        "kpiGiao": 6.646421436224999,
+        "thucHien": 0
+      },
+      {
+        "stt": 9,
+        "chiTieu": "BB_SEC_non_WO",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.521795303553151,
+        "tyTrong3": null,
+        "kpiGiao": 19.518245181215892,
+        "thucHien": 0
+      },
+      {
+        "stt": 10,
+        "chiTieu": "BB_SEC_WO",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.05,
+        "tyTrong3": null,
+        "kpiGiao": 0.13721118345300426,
+        "thucHien": 0
+      },
+      {
+        "stt": 11,
+        "chiTieu": "GB_All",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.123716596112029,
+        "tyTrong3": null,
+        "kpiGiao": 4.627735894625735,
+        "thucHien": 0
+      },
+      {
+        "stt": 12,
+        "chiTieu": "BB_UNS",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.15448810033482,
+        "tyTrong3": null,
+        "kpiGiao": 5.778773015744764,
+        "thucHien": 0
+      },
+      {
+        "stt": 13,
+        "chiTieu": "Thu_Giu",
+        "phanKhuc": "Số thu",
+        "tyTrong1": 0.5,
+        "tyTrong2": 0.15,
+        "tyTrong3": null,
+        "kpiGiao": 23.090057982695527,
+        "thucHien": 0
+      }
+    ]
+  }
+];
 
-            const hasThulySec = selectedKPIs.includes('thuly-sec');
-            const hasBaSec    = selectedKPIs.includes('ba-sec');
-            const hasThulyUns = selectedKPIs.includes('thuly-uns');
-            const hasBaUns    = selectedKPIs.includes('ba-uns');
 
-            const hasSothuSec = selectedKPIs.includes('sothu-sec');
-            const hasSothuUns = selectedKPIs.includes('sothu-uns');
-
-            // ===== Nhóm THỤ LÝ: thuly-sec, ba-sec, thuly-uns, ba-uns =====
-            if (['thuly-sec', 'ba-sec', 'thuly-uns', 'ba-uns'].includes(kpi)) {
-                let totalInternalPercent = 0;
-                if (currentConfig['thuly-uns'] && currentConfig['thuly-uns'].internal) {
-                    totalInternalPercent = currentConfig['thuly-uns'].internal;
-                } else if (currentConfig['thuly-sec'] && currentConfig['thuly-sec'].internal) {
-                    totalInternalPercent = currentConfig['thuly-sec'].internal;
-                } else if (currentConfig['ba-uns'] && currentConfig['ba-uns'].internal) {
-                    totalInternalPercent = currentConfig['ba-uns'].internal;
-                } else if (currentConfig['ba-sec'] && currentConfig['ba-sec'].internal) {
-                    totalInternalPercent = currentConfig['ba-sec'].internal;
-                }
-
-                const thulyBase = totalInternalPercent / 100;
-
-                const hasSecSide = hasThulySec || hasBaSec;
-                const hasUnsSide = hasThulyUns || hasBaUns;
-
-                if (!hasSecSide && !hasUnsSide) return 0;
-
-                const secCfg = currentConfig['thuly-sec'] || {};
-                const unsCfg = currentConfig['thuly-uns'] || {};
-
-                const secL1 = hasSecSide ? (secCfg.level1 || 0) : 0;
-                const unsL1 = hasUnsSide ? (unsCfg.level1 || 0) : 0;
-                const sumL1 = secL1 + unsL1;
-
-                let secBlockShare = 0;
-                let unsBlockShare = 0;
-
-                if (hasSecSide && hasUnsSide) {
-                    if (sumL1 > 0) {
-                        secBlockShare = secL1 / sumL1;
-                        unsBlockShare = unsL1 / sumL1;
-                    } else {
-                        secBlockShare = 0.5;
-                        unsBlockShare = 0.5;
-                    }
-                } else if (hasSecSide && !hasUnsSide) {
-                    secBlockShare = 1;
-                    unsBlockShare = 0;
-                } else if (!hasSecSide && hasUnsSide) {
-                    secBlockShare = 0;
-                    unsBlockShare = 1;
-                }
-
-                const baSecCfg = currentConfig['ba-sec'] || {};
-                const secSplitBase   = hasThulySec ? (secCfg.level2   || 0) : 0;
-                const baSecSplitBase = hasBaSec    ? (baSecCfg.level2 || 0) : 0;
-                const secSplitTotal  = secSplitBase + baSecSplitBase;
-
-                let thulySecRatio = 0;
-                let baSecRatio    = 0;
-
-                if (secSplitTotal > 0) {
-                    thulySecRatio = secSplitBase / secSplitTotal;
-                    baSecRatio    = baSecSplitBase / secSplitTotal;
-                } else {
-                    if (hasThulySec && !hasBaSec) {
-                        thulySecRatio = 1;
-                        baSecRatio    = 0;
-                    }
-                    if (hasBaSec && !hasThulySec) {
-                        thulySecRatio = 0;
-                        baSecRatio    = 1;
-                    }
-                }
-
-                const baUnsCfg = currentConfig['ba-uns'] || {};
-                const unsSplitBase   = hasThulyUns ? (unsCfg.level2   || 0) : 0;
-                const baUnsSplitBase = hasBaUns    ? (baUnsCfg.level2 || 0) : 0;
-                const unsSplitTotal  = unsSplitBase + baUnsSplitBase;
-
-                let thulyUnsRatio = 0;
-                let baUnsRatio    = 0;
-
-                if (unsSplitTotal > 0) {
-                    thulyUnsRatio = unsSplitBase / unsSplitTotal;
-                    baUnsRatio    = baUnsSplitBase / unsSplitTotal;
-                } else {
-                    if (hasThulyUns && !hasBaUns) {
-                        thulyUnsRatio = 1;
-                        baUnsRatio    = 0;
-                    }
-                    if (hasBaUns && !hasThulyUns) {
-                        thulyUnsRatio = 0;
-                        baUnsRatio    = 1;
-                    }
-                }
-
-                if (kpi === 'thuly-sec') return thulyBase * secBlockShare * thulySecRatio;
-                if (kpi === 'ba-sec')    return thulyBase * secBlockShare * baSecRatio;
-                if (kpi === 'thuly-uns') return thulyBase * unsBlockShare * thulyUnsRatio;
-                if (kpi === 'ba-uns')    return thulyBase * unsBlockShare * baUnsRatio;
-            }
-
-            // ===== Nhóm SỐ THU (Logic mới chuẩn hóa) =====
-            if (['sothu-sec', 'sothu-uns'].includes(kpi)) {
-                let totalInternalPercent = 0;
-                if (currentConfig['sothu-uns'] && currentConfig['sothu-uns'].internal) {
-                    totalInternalPercent = currentConfig['sothu-uns'].internal;
-                } else if (currentConfig['sothu-sec'] && currentConfig['sothu-sec'].internal) {
-                    totalInternalPercent = currentConfig['sothu-sec'].internal;
-                } else {
-                    totalInternalPercent = cfg.internal;
-                }
-
-                const base = totalInternalPercent / 100;
-
-                if (!hasSothuSec && !hasSothuUns) return 0;
-
-                const secCfg = currentConfig['sothu-sec'] || {};
-                const unsCfg = currentConfig['sothu-uns'] || {};
-
-                const secL1 = hasSothuSec ? (secCfg.level1 || 0) : 0;
-                const unsL1 = hasSothuUns ? (unsCfg.level1 || 0) : 0;
-                const sumL1 = secL1 + unsL1;
-
-                let secRatio = 0;
-                let unsRatio = 0;
-
-                // Quy tắc gánh team của nhóm Số thu
-                if (hasSothuSec && hasSothuUns) {
-                    if (sumL1 > 0) {
-                        secRatio = secL1 / sumL1;
-                        unsRatio = unsL1 / sumL1;
-                    } else {
-                        secRatio = 0.5;
-                        unsRatio = 0.5;
-                    }
-                } else if (hasSothuSec && !hasSothuUns) {
-                    secRatio = 1;
-                    unsRatio = 0;
-                } else if (!hasSothuSec && hasSothuUns) {
-                    secRatio = 0;
-                    unsRatio = 1;
-                }
-
-                if (kpi === 'sothu-sec') {
-                    if (!hasSothuSec) return 0;
-                    const l2 = (cfg.level2 !== undefined ? cfg.level2 : 100) / 100;
-                    return base * secRatio * l2;
-                }
-
-                if (kpi === 'sothu-uns') {
-                    if (!hasSothuUns) return 0;
-                    const l2 = (cfg.level2 !== undefined ? cfg.level2 : 100) / 100;
-                    return base * unsRatio * l2;
-                }
-            }
-
-            // Fallback an toàn cho các KPI khác
-            return (cfg.internal / 100);
-        }
-
-        // ====== Hàm tính Trọng số chi tiết cuối cùng ======
-        function getDetailWeight(kpi) {
-            // Nhờ logic gom nhóm ở trên, getInternalFraction hiện đã tính chính xác tỷ trọng chia chéo
-            // cho 6 chỉ tiêu lõi này (đã cân đối C1, C2 và bù trừ cho nhau).
-            if (['thuly-sec', 'ba-sec', 'thuly-uns', 'ba-uns', 'sothu-sec', 'sothu-uns'].includes(kpi)) {
-                return getInternalFraction(kpi);
-            }
-
-            // Fallback bình thường cho các KPI thêm mới (nếu có)
-            const cfg = currentConfig[kpi];
-            if (!cfg) return 0;
-            const internalBase = getInternalFraction(kpi);
-            const levelMul = ((cfg.level1 !== undefined ? cfg.level1 : 100) / 100) * ((cfg.level2 !== undefined ? cfg.level2 : 100) / 100);
-            return internalBase * levelMul;
-        }
-        
-        function updateKPITable() {
-            const tableBody = document.getElementById('kpiTableBody');
-            tableBody.innerHTML = '';
-            
-            selectedKPIs.forEach(kpi => {
-                const config = currentConfig[kpi];
-                if (!config) return;
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${config.name}</td>
-                    <td><input type="number" id="kpi_${kpi}" placeholder="Nhập KPI" step="0.01" min="0"></td>
-                    <td><input type="number" id="actual_${kpi}" placeholder="Nhập thực hiện" step="0.01" min="0"></td>
-                    <td id="percent_${kpi}">0%</td>
-                    <td id="nb_${kpi}">0%</td>
-                    <td id="final_${kpi}" class="result">0%</td>
-                `;
-                
-                tableBody.appendChild(row);
-                
-                const kpiInput = document.getElementById(`kpi_${kpi}`);
-                const actualInput = document.getElementById(`actual_${kpi}`);
-                
-                kpiInput.addEventListener('input', calculateKPI);
-                actualInput.addEventListener('input', calculateKPI);
-            });
-            
-            document.getElementById('totalPercent').textContent = '0%';
-            document.getElementById('totalFinal').textContent = '0%';
-            
-            updateSummary();
-            calculateKPI();
-        }
-        
-        function calculateKPI() {
-            let totalPercent = 0;
-            let totalFinal = 0;
-            let validRows = 0;
-            
-            selectedKPIs.forEach(kpi => {
-                const kpiInput = document.getElementById(`kpi_${kpi}`);
-                const actualInput = document.getElementById(`actual_${kpi}`);
-                const percentCell = document.getElementById(`percent_${kpi}`);
-                const finalCell = document.getElementById(`final_${kpi}`);
-                const nbCell = document.getElementById(`nb_${kpi}`);
-                
-                if (!kpiInput || !actualInput) return;
-                
-                const kpiValue = parseFloat(kpiInput.value) || 0;
-                const actualValue = parseFloat(actualInput.value) || 0;
-                
-                const internalFraction = getInternalFraction(kpi); // Hiển thị NB thực tế 0–1
-                const detailWeight = getDetailWeight(kpi);         // 0–1
-                
-                let percent = 0;
-                if (kpiValue > 0) {
-                    percent = Math.min(actualValue / kpiValue, 1.5); // max 150%
-                }
-                
-                // KPI FINAL (%)
-                const final = percent * detailWeight * 100;
-                
-                if (percentCell) {
-                    percentCell.textContent = (percent * 100).toFixed(2) + '%';
-                }
-                if (nbCell) {
-                    nbCell.textContent = (internalFraction * 100).toFixed(2) + '%';
-                }
-                if (finalCell) {
-                    finalCell.textContent = final.toFixed(2) + '%';
-                }
-                
-                if (kpiValue > 0) {
-                    totalPercent += percent;
-                    totalFinal += final;
-                    validRows++;
-                }
-            });
-            
-            const avgPercent = validRows > 0 ? totalPercent / validRows : 0;
-            document.getElementById('totalPercent').textContent = (avgPercent * 100).toFixed(2) + '%';
-            document.getElementById('totalFinal').textContent = totalFinal.toFixed(2) + '%';
-            
-            updateSummary();
-        }
-        
-        function updateSummary() {
-            const totalFinalText = document.getElementById('totalFinal').textContent || '0';
-            const totalFinal = parseFloat(totalFinalText.replace('%', '')) || 0;
-            const summaryText = document.getElementById('summaryText');
-            const summary = document.getElementById('summary');
-            
-            if (selectedKPIs.length === 0) {
-                summaryText.textContent = 'Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.';
-                summary.className = 'summary';
-            } else if (totalFinal === 0) {
-                summaryText.textContent = 'Vui lòng nhập giá trị KPI Giao và Thực hiện để xem kết quả. Lưu ý nhập chi tiết để ra kết quả chính xác';
-                summary.className = 'summary';
-            } else {
-                let performanceLevel = '';
-                let performanceClass = '';
-                
-                if (totalFinal >= 100) {
-                    performanceLevel = '10H CÓ MẶT CTY';
-                    performanceClass = 'performance-excellent';
-                } else if (totalFinal >= 80) {
-                    performanceLevel = 'HÚ HỒN CHIM ÉN';
-                    performanceClass = 'performance-average';
-                } else {
-                    performanceLevel = 'SẮP COOK RỒI';
-                    performanceClass = 'performance-poor';
-                }
-                
-                summaryText.innerHTML = `
-                    Tổng điểm KPI của bạn là <strong>${totalFinal.toFixed(2)}%</strong>.<br>
-                    Mức độ hoàn thành: <strong>${performanceLevel}</strong>.
-                `;
-                summary.className = `summary ${performanceClass}`;
-            }
-        }
-        
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notificationText');
-            
-            notificationText.textContent = message;
-            notification.className = `notification ${type} show`;
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-        
-        function saveToLocalStorage() {
-            const data = {
-                selectedKPIs: selectedKPIs,
-                kpiValues: {}
-            };
-            
-            selectedKPIs.forEach(kpi => {
-                const kpiValue = document.getElementById(`kpi_${kpi}`)?.value || '';
-                const actualValue = document.getElementById(`actual_${kpi}`)?.value || '';
-                data.kpiValues[kpi] = { kpi: kpiValue, actual: actualValue };
-            });
-            
-            localStorage.setItem('kpiUserData', JSON.stringify(data));
-            showNotification('Dữ liệu cá nhân đã được lưu thành công!', 'success');
-        }
-        
-        function loadUserData() {
-            const savedData = localStorage.getItem('kpiUserData');
-            if (!savedData) {
-                updateKPITable();
-                return;
-            }
-
-            const data = JSON.parse(savedData);
-            selectedKPIs = data.selectedKPIs || [];
-            
-            document.querySelectorAll('.kpi-option input[type="checkbox"]').forEach(checkbox => {
-                const kpiOption = checkbox.closest('.kpi-option');
-                const kpi = kpiOption.getAttribute('data-kpi');
-                const isSelected = selectedKPIs.includes(kpi);
-                checkbox.checked = isSelected;
-                kpiOption.classList.toggle('selected', isSelected);
-            });
-            
-            updateKPITable();
-            
-            if (data.kpiValues) {
-                Object.keys(data.kpiValues).forEach(kpi => {
-                    const kpiInput = document.getElementById(`kpi_${kpi}`);
-                    const actualInput = document.getElementById(`actual_${kpi}`);
-                    if (kpiInput && actualInput) {
-                        kpiInput.value = data.kpiValues[kpi].kpi;
-                        actualInput.value = data.kpiValues[kpi].actual;
-                    }
-                });
-                calculateKPI();
-            }
-        }
-    </script>
+let rows = [];
+const $ = id => document.getElementById(id);
+const num = v => Number(v || 0);
+const fmt = n => (Number.isFinite(n) ? n : 0).toLocaleString('vi-VN', {maximumFractionDigits:2});
+const pct = n => `${((Number.isFinite(n)?n:0)*100).toFixed(2)}%`;
+function weightOf(r) { const c3 = r.tyTrong3 === null || r.tyTrong3 === '' || r.tyTrong3 === undefined ? 1 : num(r.tyTrong3); return num(r.tyTrong1)*num(r.tyTrong2)*c3; }
+function completionOf(r) { const giao=num(r.kpiGiao), th=num(r.thucHien); if(!giao) return 0; return Math.min(th/giao,1.5); }
+function scoreOf(r) { return weightOf(r)*completionOf(r); }
+function labelOf(r) { return `${r.chiTieu || 'KPI'} ${r.phanKhuc ? '- '+r.phanKhuc : ''}`.replace(/\s+/g,' ').trim(); }
+function toast(msg='Thao tác thành công!') { const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
+function loadTemplate(i) { rows = structuredClone(KPI_TEMPLATES[i].kpis).map(r=>({...r, active:true})); render(); }
+function render() { renderCards(); renderTable(); renderSummary(); }
+function renderCards() {
+  const box=$('kpiCards'); box.innerHTML='';
+  rows.forEach((r,i)=>{
+    const card=document.createElement('div'); card.className='kpi-card';
+    card.innerHTML=`<label><span>${labelOf(r)}</span><input type="checkbox" data-i="${i}" data-k="active" ${r.active?'checked':''}></label>
+      <div class="field"><div><small>KPI giao</small><input type="number" step="0.01" value="${r.kpiGiao ?? 0}" data-i="${i}" data-k="kpiGiao"></div><div><small>Thực hiện</small><input type="number" step="0.01" value="${r.thucHien ?? 0}" data-i="${i}" data-k="thucHien"></div></div>
+      <div class="mini-result"><span>Trọng số ${pct(weightOf(r))}</span><b>${pct(completionOf(r))}</b></div>`;
+    box.appendChild(card);
+  });
+  box.querySelectorAll('input').forEach(inp=>inp.addEventListener('input', updateFromInput));
+}
+function renderTable() {
+  const tbody=$('detailRows'); tbody.innerHTML=''; let totalWeight=0,totalScore=0;
+  rows.filter(r=>r.active).forEach(r=>{
+    const w=weightOf(r), ht=completionOf(r), sc=scoreOf(r); totalWeight+=w; totalScore+=sc;
+    const cls=ht>=1?'ok':ht<.7?'bad':'';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><b>${labelOf(r)}</b><br><small style="color:#64748b">Trọng số: ${pct(w)}</small></td><td class="num">${fmt(num(r.kpiGiao))}</td><td class="num">${fmt(num(r.thucHien))}</td><td class="num"><span class="pill ${cls}">${pct(ht)}</span></td><td class="num">${fmt(num(r.thucHien))}</td><td class="num"><b>${pct(sc)}</b></td>`;
+    tbody.appendChild(tr);
+  });
+  const total=totalWeight?totalScore/totalWeight:0;
+  const tr=document.createElement('tr'); tr.className='total-row';
+  tr.innerHTML=`<td>TỔNG CỘNG</td><td></td><td></td><td class="num">${pct(total)}</td><td></td><td class="num">${pct(totalScore)}</td>`; tbody.appendChild(tr);
+}
+function renderSummary() {
+  const active=rows.filter(r=>r.active); const tw=active.reduce((s,r)=>s+weightOf(r),0); const ts=active.reduce((s,r)=>s+scoreOf(r),0); const total=tw?ts/tw:0;
+  $('autoWeight').textContent=pct(tw); $('totalWeightTop').textContent=pct(tw); $('countTop').textContent=active.length; $('finalTop').textContent=pct(total); $('grandFinal').textContent=pct(total);
+  $('ratingText').textContent = !active.length?'Chưa có dữ liệu': total>=1.2?'Xuất sắc':total>=1?'Đạt KPI':total>=.7?'Cần cải thiện':'Chưa đạt';
+  $('notice').innerHTML = active.length ? `✅ Đang tính <b>${active.length}</b> chỉ tiêu. Tổng trọng số <b>${pct(tw)}</b>, KPI final <b>${pct(total)}</b>.` : '💡 <b>Vui lòng chọn ít nhất một chỉ tiêu KPI để tính toán.</b><br>Lưu ý: Nhập số chi tiết để ra kết quả chính xác nhất.';
+}
+function updateFromInput(e) { const i=+e.target.dataset.i, k=e.target.dataset.k; rows[i][k]=k==='active'?e.target.checked:(e.target.type==='number'?Number(e.target.value):e.target.value); render(); }
+$('saveBtn').onclick=()=>{ localStorage.setItem('kpi-personal-data', JSON.stringify({template:$('templateSelect').value, rows})); toast('Đã lưu dữ liệu cá nhân!'); };
+$('checkBtn').onclick=()=>toast('Dữ liệu KPI đang là phiên bản mới nhất!');
+$('resetBtn').onclick=()=>{ localStorage.removeItem('kpi-personal-data'); loadTemplate(+$('templateSelect').value); toast('Đã làm mới dữ liệu!'); };
+window.addEventListener('DOMContentLoaded',()=>{ const sel=$('templateSelect'); KPI_TEMPLATES.forEach((t,i)=>{ const op=document.createElement('option'); op.value=i; op.textContent=t.name; sel.appendChild(op); }); sel.onchange=()=>loadTemplate(+sel.value); const saved=localStorage.getItem('kpi-personal-data'); if(saved){ try{ const s=JSON.parse(saved); sel.value=s.template||0; rows=s.rows||[]; render(); }catch(e){ loadTemplate(0); } } else loadTemplate(0); });
+</script>
 </body>
 </html>
