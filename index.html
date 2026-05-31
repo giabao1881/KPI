@@ -1,165 +1,865 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tra cứu KPI Cá nhân</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <style>
-        body { padding: 20px; background-color: #f8f9fa; }
-        .container { max-width: 900px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .table-responsive { margin-top: 20px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tính KPI Cá Nhân</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3250;
+    --accent: #4f7ef8;
+    --accent2: #7c3aed;
+    --green: #22c55e;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Login Screen */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: radial-gradient(ellipse at 20% 50%, rgba(79,126,248,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.1) 0%, transparent 50%),
+                var(--bg);
+  }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+  }
+
+  .login-logo {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .login-card h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .login-card p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .input-group {
+    margin-bottom: 16px;
+  }
+
+  .input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .input-group input, .input-group select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-group input:focus, .input-group select:focus {
+    border-color: var(--accent);
+  }
+
+  .input-group select option {
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px;
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  #login-error {
+    color: var(--red);
+    font-size: 13px;
+    margin-top: 10px;
+    text-align: center;
+    display: none;
+  }
+
+  /* Main App */
+  #app-screen { display: none; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-logo {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .header-title {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .header-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .btn-logout {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 28px 20px;
+  }
+
+  /* KPI Score Card */
+  .score-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+  }
+
+  .score-card.main {
+    background: linear-gradient(135deg, rgba(79,126,248,0.15), rgba(124,58,237,0.1));
+    border-color: rgba(79,126,248,0.4);
+    grid-column: 1 / -1;
+    padding: 28px;
+  }
+
+  .score-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .score-value {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .score-card.main .score-value { font-size: 58px; }
+
+  .score-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  /* Progress ring */
+  .ring-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 10px;
+  }
+
+  .ring-container svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--surface2); stroke-width: 6; }
+  .ring-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+
+  /* KPI Table */
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .kpi-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .kpi-group-header {
+    background: var(--surface2);
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .kpi-group-weight {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    text-transform: none;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    font-weight: 500;
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 12px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(46,50,80,0.5);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .indicator-name {
+    font-weight: 500;
+  }
+
+  .indicator-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .target-value {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .actual-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    width: 110px;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: right;
+  }
+
+  .actual-input:focus { border-color: var(--accent); }
+
+  .pct-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: visible;
+    position: relative;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s;
+    min-width: 0;
+  }
+
+  .pct-text {
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    min-width: 48px;
+    text-align: right;
+    font-weight: 500;
+  }
+
+  /* Group subtotal row */
+  .subtotal-row td {
+    background: rgba(79,126,248,0.06);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--accent);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Action bar */
+  .action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    z-index: 99;
+  }
+
+  .btn-calc {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: var(--radius);
+    padding: 12px 32px;
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-calc:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  .btn-reset {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 24px;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-reset:hover { border-color: var(--text); color: var(--text); }
+
+  .pb-bar { padding-bottom: 80px; }
+
+  /* Color helpers */
+  .c-green { color: var(--green); }
+  .c-yellow { color: var(--yellow); }
+  .c-red { color: var(--red); }
+  .c-blue { color: var(--accent); }
+  .c-muted { color: var(--muted); }
+
+  .bg-green { background: var(--green); }
+  .bg-yellow { background: var(--yellow); }
+  .bg-red { background: var(--red); }
+  .bg-blue { background: var(--accent); }
+  .bg-gray { background: var(--muted); }
+
+  .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+
+  @media (max-width: 600px) {
+    .score-section { grid-template-columns: 1fr 1fr; }
+    .score-card.main { grid-column: 1 / -1; }
+    th:nth-child(3), td:nth-child(3) { display: none; }
+    .actual-input { width: 90px; }
+    .login-card { padding: 32px 24px; }
+  }
+</style>
 </head>
 <body>
 
-<div class="container">
-    <h2 class="text-center text-primary mb-4">HỆ THỐNG TRA CỨU TRỌNG SỐ & KPI</h2>
-    
-    <div class="row mb-3">
-        <div class="col-md-8">
-            <input type="text" id="emailInput" class="form-control" placeholder="Nhập Email của bạn (VD: anhnt110)">
-        </div>
-        <div class="col-md-4">
-            <button class="btn btn-primary w-100" onclick="tinhKPI()">Tra cứu KPI</button>
-        </div>
+<!-- Login -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">📊</div>
+    <h1>Tính KPI Cá Nhân</h1>
+    <p>Nhập mã nhân viên để xem và tính KPI của bạn</p>
+    <div class="input-group">
+      <label>Mã nhân viên</label>
+      <input type="text" id="user-input" placeholder="Ví dụ: ANHNT110" autocomplete="off"
+             style="text-transform:uppercase" />
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Xem KPI của tôi →</button>
+    <div id="login-error">⚠ Không tìm thấy mã nhân viên. Vui lòng kiểm tra lại.</div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app-screen">
+  <header>
+    <div class="header-left">
+      <div class="header-logo">📊</div>
+      <div class="header-title">KPI Dashboard</div>
+    </div>
+    <div class="header-user">
+      <div class="user-badge" id="header-user">—</div>
+      <button class="btn-logout" onclick="doLogout()">Đăng xuất</button>
+    </div>
+  </header>
+
+  <div class="container pb-bar">
+    <!-- Score summary -->
+    <div class="score-section" id="score-section">
+      <div class="score-card main">
+        <div class="score-label">KPI Tổng</div>
+        <div class="score-value" id="score-total" style="color: var(--accent)">—</div>
+        <div class="score-badge" id="score-badge">Chưa tính</div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Tố tụng</div>
+        <div class="score-value" id="score-tt" style="font-size:28px;margin-top:4px">—</div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Số thu</div>
+        <div class="score-value" id="score-st" style="font-size:28px;margin-top:4px">—</div>
+      </div>
     </div>
 
-    <div id="loading" class="text-center text-secondary d-none">Đang tải dữ liệu...</div>
-    <div id="errorMsg" class="text-danger mt-2"></div>
+    <!-- KPI Table -->
+    <div class="section-title">📋 Chi tiết chỉ tiêu</div>
+    <div id="kpi-table-container"></div>
+  </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped" id="resultTable" style="display: none;">
-            <thead class="table-dark">
-                <tr>
-                    <th>Chỉ tiêu (Cấp 3)</th>
-                    <th>Trọng số Cấp 1</th>
-                    <th>Trọng số Cấp 2</th>
-                    <th>Trọng số Cấp 3</th>
-                    <th>Trọng số Chi tiết (Tổng)</th>
-                    <th>KPI Giao</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                </tbody>
-        </table>
-    </div>
+  <div class="action-bar">
+    <button class="btn-reset" onclick="resetActuals()">↩ Reset</button>
+    <button class="btn-calc" onclick="calculateKPI()">⚡ Tính KPI</button>
+  </div>
 </div>
 
 <script>
-    // Định nghĩa cấu trúc chỉ tiêu (Sửa/Thêm các chỉ tiêu của bạn vào đây)
-    const mapping = {
-        'Thu_ly_SEC': ['To_tung_SEC', '1_To_tung'],
-        'Tham_dinh_SEC': ['To_tung_SEC', '1_To_tung'],
-        'Ban_an_SEC': ['To_tung_SEC', '1_To_tung'],
-        'QD_THA_SEC': ['To_tung_SEC', '1_To_tung'],
-        'Ke_bien_SEC': ['To_tung_SEC', '1_To_tung'],
-        'Thu_ly_UNS': ['To_tung_UNS', '1_To_tung'],
-        'Ban_an_UNS': ['To_tung_UNS', '1_To_tung'],
-        'QD_THA_UNS': ['To_tung_UNS', '1_To_tung'],
-        'BB_SEC_non_WO': ['So_thu_SEC', '2_So_thu'],
-        'BB_SEC_WO': ['So_thu_SEC', '2_So_thu'],
-        'GB_All': ['So_thu_SEC', '2_So_thu'],
-        'BB_UNS': ['So_thu_UNS', '2_So_thu'],
-        'Thu_Giu': ['So_thu_UNS', '2_So_thu']
-    };
+// ── Data ──────────────────────────────────────────────────────────────────
+let KPI_DATA = null;
+let currentUser = null;
 
-    let allData = [];
+async function loadData() {
+  const r = await fetch('kpi_data.json');
+  KPI_DATA = await r.json();
+}
 
-    // Tự động tải file data.csv khi mở trang web
-    window.onload = function() {
-        document.getElementById('loading').classList.remove('d-none');
-        Papa.parse("data.csv", {
-            download: true,
-            header: true,
-            complete: function(results) {
-                allData = results.data;
-                document.getElementById('loading').classList.add('d-none');
-            },
-            error: function() {
-                document.getElementById('errorMsg').innerText = "Không thể tải file data.csv. Hãy chắc chắn file đang nằm cùng thư mục.";
-                document.getElementById('loading').classList.add('d-none');
-            }
-        });
+// ── Auth ──────────────────────────────────────────────────────────────────
+async function doLogin() {
+  if (!KPI_DATA) await loadData();
+  const raw = document.getElementById('user-input').value.trim().toUpperCase();
+  if (!raw) return;
+  if (!KPI_DATA[raw]) {
+    document.getElementById('login-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('login-error').style.display = 'none';
+  currentUser = raw;
+  document.getElementById('header-user').textContent = raw;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  renderKPITable(KPI_DATA[raw]);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('user-input').value = '';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('score-total').textContent = '—';
+  document.getElementById('score-badge').textContent = 'Chưa tính';
+  document.getElementById('score-tt').textContent = '—';
+  document.getElementById('score-st').textContent = '—';
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+const CODE_LABELS = {
+  '1_To_tung': 'Tố Tụng',
+  '2_So_thu': 'Số Thu',
+  'To_tung_SEC': 'Tố Tụng SEC',
+  'To_tung_UNS': 'Tố Tụng UNS',
+  'Thu_ly_SEC': 'Thu lý SEC',
+  'Tham_dinh_SEC': 'Thẩm định SEC',
+  'Ban_an_SEC': 'Bản án SEC',
+  'QD_THA_SEC': 'QĐ THA SEC',
+  'Ke_bien_SEC': 'Kê biên SEC',
+  'Thu_ly_UNS': 'Thu lý UNS',
+  'Ban_an_UNS': 'Bản án UNS',
+  'QD_THA_UNS': 'QĐ THA UNS',
+  'BB_SEC_non_WO': 'Biên bản SEC (non-WO)',
+  'BB_SEC_WO': 'Biên bản SEC (WO)',
+  'BB_UNS': 'Biên bản UNS',
+  'GB_All': 'Giải buộc (All)',
+  'Thu_Giu': 'Thu giữ',
+  'So_thu_SEC': 'Số thu SEC',
+  'So_thu_UNS': 'Số thu UNS',
+};
+
+function label(code) {
+  return CODE_LABELS[code] || code.replace(/_/g, ' ');
+}
+
+function pct(actual, target) {
+  if (!target || target === 0) return actual > 0 ? 150 : 0;
+  return Math.min(150, (actual / target) * 100);
+}
+
+function colorClass(p) {
+  if (p >= 100) return 'c-green';
+  if (p >= 70) return 'c-yellow';
+  return 'c-red';
+}
+
+function barClass(p) {
+  if (p >= 100) return 'bg-green';
+  if (p >= 70) return 'bg-yellow';
+  return 'bg-red';
+}
+
+function renderKPITable(rows) {
+  // Identify groups: TT1 group and ST1 group
+  // rows have check: '', TT1, TT2_SEC, TT3_SEC, TT2_UNS, TT3_UNS, ST1, ST2
+  const container = document.getElementById('kpi-table-container');
+  container.innerHTML = '';
+
+  // Group structure
+  const groups = [
+    {
+      id: 'tt',
+      title: '1. Tố Tụng',
+      scoreId: 'score-tt',
+      top: rows.find(r => r.check === 'TT1'),
+      sub2: [
+        {
+          id: 'tt_sec',
+          title: 'SEC',
+          top: rows.find(r => r.code === 'To_tung_SEC'),
+          items: rows.filter(r => r.check === 'TT3_SEC')
+        },
+        {
+          id: 'tt_uns',
+          title: 'UNS',
+          top: rows.find(r => r.code === 'To_tung_UNS'),
+          items: rows.filter(r => r.check === 'TT3_UNS')
+        }
+      ]
+    },
+    {
+      id: 'st',
+      title: '2. Số Thu',
+      scoreId: 'score-st',
+      top: rows.find(r => r.check === 'ST1'),
+      items: rows.filter(r => r.check === 'ST2')
+    }
+  ];
+
+  groups.forEach(group => {
+    const allItems = group.sub2
+      ? group.sub2.flatMap(s => s.items)
+      : (group.items || []);
+
+    const groupEl = document.createElement('div');
+    groupEl.className = 'kpi-group';
+
+    const wt = group.top ? (group.top.weight * 100).toFixed(0) : 0;
+    groupEl.innerHTML = `
+      <div class="kpi-group-header">
+        <span>${group.title}</span>
+        <span class="kpi-group-weight">Trọng số: ${wt}%</span>
+      </div>`;
+
+    const table = document.createElement('table');
+    table.innerHTML = `<thead><tr>
+      <th>Chỉ tiêu</th>
+      <th style="text-align:right">Mục tiêu</th>
+      <th style="text-align:right">Trọng số</th>
+      <th style="text-align:right">Thực hiện</th>
+      <th style="min-width:160px">% Hoàn thành</th>
+    </tr></thead>`;
+    const tbody = document.createElement('tbody');
+
+    function makeRow(item, indent = false) {
+      const tr = document.createElement('tr');
+      const hasTarget = item.target !== null && item.target !== undefined;
+      const targetFmt = hasTarget ? item.target.toLocaleString('vi-VN', {maximumFractionDigits: 2}) : '—';
+      const wPct = (item.weight * 100).toFixed(1);
+
+      tr.innerHTML = `
+        <td>
+          <div class="indicator-name" style="${indent ? 'padding-left:14px;font-size:13px' : ''}">${label(item.code)}</div>
+        </td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums" class="target-value">${targetFmt}</td>
+        <td style="text-align:right;color:var(--muted);font-size:13px">${wPct}%</td>
+        <td style="text-align:right">
+          ${hasTarget
+            ? `<input class="actual-input" type="number" min="0" step="0.01"
+                      data-code="${item.code}" placeholder="0"
+                      oninput="onActualChange(this)">`
+            : '<span class="c-muted" style="font-size:13px">—</span>'}
+        </td>
+        <td>
+          ${hasTarget
+            ? `<div class="pct-bar">
+                <div class="bar-wrap"><div class="bar-fill bg-gray" id="bar-${item.code}" style="width:0%"></div></div>
+                <span class="pct-text c-muted" id="pct-${item.code}">—</span>
+               </div>`
+            : ''}
+        </td>`;
+      return tr;
     }
 
-    function tinhKPI() {
-        const email = document.getElementById('emailInput').value.trim();
-        const errorMsg = document.getElementById('errorMsg');
-        const resultTable = document.getElementById('resultTable');
-        const tableBody = document.getElementById('tableBody');
-        
-        errorMsg.innerText = "";
-        tableBody.innerHTML = "";
-        resultTable.style.display = "none";
-
-        if(!email) {
-            errorMsg.innerText = "Vui lòng nhập email!";
-            return;
-        }
-
-        if(allData.length === 0) {
-            errorMsg.innerText = "Dữ liệu chưa tải xong, vui lòng thử lại sau vài giây.";
-            return;
-        }
-
-        // Lọc dữ liệu của user đang tìm
-        const userDataArray = allData.filter(row => row['EMAIL_USER'] === email);
-        
-        if(userDataArray.length === 0) {
-            errorMsg.innerText = "Không tìm thấy dữ liệu cho nhân viên này!";
-            return;
-        }
-
-        // Chuyển mảng dữ liệu thành Object để dễ tra cứu: { '1_To_tung': { TRONG_SO: 0.5, CHI_TIEU: 0 }, ... }
-        let userDict = {};
-        userDataArray.forEach(row => {
-            let kpiCode = row['TEN_CHI_TIEU_CODE'];
-            if(kpiCode) {
-                userDict[kpiCode.trim()] = {
-                    trongSo: parseFloat(row['TRONG_SO_CHITIEU']) || 0,
-                    kpiGiao: parseFloat(row['CHI_TIEU_THANG']) || 0
-                };
-            }
-        });
-
-        let hasData = false;
-
-        // Bắt đầu tính toán dựa trên mapping
-        for (const [chiTieuCap3, parents] of Object.entries(mapping)) {
-            if (userDict[chiTieuCap3]) {
-                hasData = true;
-                const cap2 = parents[0];
-                const cap1 = parents[1];
-
-                const tsCap1 = userDict[cap1] ? userDict[cap1].trongSo : 0;
-                const tsCap2 = userDict[cap2] ? userDict[cap2].trongSo : 0;
-                const tsCap3 = userDict[chiTieuCap3].trongSo;
-                const kpiGiao = userDict[chiTieuCap3].kpiGiao;
-
-                const trongSoTong = tsCap1 * tsCap2 * tsCap3;
-
-                // Tạo dòng mới trong bảng HTML
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="text-primary fw-bold">${chiTieuCap3}</td>
-                    <td>${(tsCap1 * 100).toFixed(2)}%</td>
-                    <td>${(tsCap2 * 100).toFixed(2)}%</td>
-                    <td>${(tsCap3 * 100).toFixed(2)}%</td>
-                    <td class="text-danger fw-bold">${(trongSoTong * 100).toFixed(2)}%</td>
-                    <td class="text-success fw-bold">${kpiGiao.toLocaleString()}</td>
-                `;
-                tableBody.appendChild(tr);
-            }
-        }
-
-        if(hasData) {
-            resultTable.style.display = "table";
-        } else {
-            errorMsg.innerText = "Nhân sự này không có chỉ tiêu chi tiết nào trong hệ thống.";
-        }
+    if (group.sub2) {
+      group.sub2.forEach(sub => {
+        if (!sub.items.length) return;
+        // Sub-group label row
+        const hdr = document.createElement('tr');
+        hdr.innerHTML = `<td colspan="5" style="padding:8px 16px 4px;background:rgba(255,255,255,0.02)">
+          <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">
+            ${sub.title}${sub.top ? ' — Trọng số: ' + (sub.top.weight * 100).toFixed(0) + '%' : ''}
+          </span></td>`;
+        tbody.appendChild(hdr);
+        sub.items.forEach(item => tbody.appendChild(makeRow(item, true)));
+      });
+    } else {
+      allItems.forEach(item => tbody.appendChild(makeRow(item)));
     }
+
+    // Subtotal row
+    const subTotal = document.createElement('tr');
+    subTotal.className = 'subtotal-row';
+    subTotal.id = `subtotal-${group.id}`;
+    subTotal.innerHTML = `<td colspan="4">Điểm nhóm ${group.title}</td><td id="subtotal-val-${group.id}">—</td>`;
+    tbody.appendChild(subTotal);
+
+    table.appendChild(tbody);
+    groupEl.appendChild(table);
+    container.appendChild(groupEl);
+  });
+}
+
+// ── Live update ───────────────────────────────────────────────────────────
+function onActualChange(input) {
+  const code = input.dataset.code;
+  const rows = KPI_DATA[currentUser];
+  const item = rows.find(r => r.code === code);
+  if (!item || item.target === null) return;
+  const actual = parseFloat(input.value) || 0;
+  const p = pct(actual, item.target);
+  const barEl = document.getElementById('bar-' + code);
+  const pctEl = document.getElementById('pct-' + code);
+  if (barEl) {
+    barEl.style.width = Math.min(100, p) + '%';
+    barEl.className = 'bar-fill ' + barClass(p);
+  }
+  if (pctEl) {
+    pctEl.textContent = p.toFixed(1) + '%';
+    pctEl.className = 'pct-text ' + colorClass(p);
+  }
+}
+
+// ── Calculate ─────────────────────────────────────────────────────────────
+function calculateKPI() {
+  const rows = KPI_DATA[currentUser];
+
+  // Get actuals from inputs
+  const actuals = {};
+  document.querySelectorAll('.actual-input').forEach(inp => {
+    actuals[inp.dataset.code] = parseFloat(inp.value) || 0;
+  });
+
+  // Helper: calculate completion % for a list of leaf items
+  function calcLeafScore(items) {
+    let totalWeight = 0;
+    let weightedScore = 0;
+    items.forEach(item => {
+      if (item.target === null || item.target === undefined) return;
+      const actual = actuals[item.code] || 0;
+      const p = pct(actual, item.target); // 0-150
+      weightedScore += p * item.weight;
+      totalWeight += item.weight;
+    });
+    if (totalWeight === 0) return 0;
+    return weightedScore / totalWeight;
+  }
+
+  // TT group
+  const ttTop = rows.find(r => r.check === 'TT1');
+  const ttSecItems = rows.filter(r => r.check === 'TT3_SEC');
+  const ttUnsItems = rows.filter(r => r.check === 'TT3_UNS');
+  const ttSec = rows.find(r => r.code === 'To_tung_SEC');
+  const ttUns = rows.find(r => r.code === 'To_tung_UNS');
+
+  const ttSecScore = calcLeafScore(ttSecItems);
+  const ttUnsScore = calcLeafScore(ttUnsItems);
+
+  const ttSecW = ttSec ? ttSec.weight : 0.5;
+  const ttUnsW = ttUns ? ttUns.weight : 0.5;
+  const ttScore = ttSecScore * ttSecW + ttUnsScore * ttUnsW;
+
+  // ST group
+  const stTop = rows.find(r => r.check === 'ST1');
+  const stItems = rows.filter(r => r.check === 'ST2');
+  const stScore = calcLeafScore(stItems);
+
+  // Total
+  const ttW = ttTop ? ttTop.weight : 0.1;
+  const stW = stTop ? stTop.weight : 0.9;
+  const total = ttScore * ttW + stScore * stW;
+
+  // Update UI
+  const totalEl = document.getElementById('score-total');
+  const badge = document.getElementById('score-badge');
+  totalEl.textContent = total.toFixed(2) + '%';
+  totalEl.style.color = total >= 100 ? 'var(--green)' : total >= 70 ? 'var(--yellow)' : 'var(--red)';
+
+  badge.textContent = total >= 100 ? '✅ Đạt KPI' : total >= 70 ? '⚡ Đang tiến triển' : '❌ Cần cố gắng hơn';
+  badge.className = 'score-badge ' + (total >= 100 ? 'badge-green' : total >= 70 ? 'badge-yellow' : 'badge-red');
+
+  document.getElementById('score-tt').textContent = ttScore.toFixed(1) + '%';
+  document.getElementById('score-tt').className = 'score-value ' + colorClass(ttScore);
+
+  document.getElementById('score-st').textContent = stScore.toFixed(1) + '%';
+  document.getElementById('score-st').className = 'score-value ' + colorClass(stScore);
+
+  // Subtotals in table
+  const stValEl = document.getElementById('subtotal-val-tt');
+  if (stValEl) {
+    stValEl.textContent = ttScore.toFixed(2) + '%';
+    stValEl.className = colorClass(ttScore);
+  }
+  const stValEl2 = document.getElementById('subtotal-val-st');
+  if (stValEl2) {
+    stValEl2.textContent = stScore.toFixed(2) + '%';
+    stValEl2.className = colorClass(stScore);
+  }
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetActuals() {
+  document.querySelectorAll('.actual-input').forEach(inp => { inp.value = ''; });
+  document.querySelectorAll('.bar-fill').forEach(b => { b.style.width = '0%'; b.className = 'bar-fill bg-gray'; });
+  document.querySelectorAll('.pct-text').forEach(p => { p.textContent = '—'; p.className = 'pct-text c-muted'; });
+  document.getElementById('score-total').textContent = '—';
+  document.getElementById('score-total').style.color = 'var(--accent)';
+  document.getElementById('score-badge').textContent = 'Chưa tính';
+  document.getElementById('score-badge').className = 'score-badge';
+  document.getElementById('score-tt').textContent = '—';
+  document.getElementById('score-st').textContent = '—';
+  const s1 = document.getElementById('subtotal-val-tt');
+  const s2 = document.getElementById('subtotal-val-st');
+  if (s1) s1.textContent = '—';
+  if (s2) s2.textContent = '—';
+}
 </script>
 </body>
 </html>
